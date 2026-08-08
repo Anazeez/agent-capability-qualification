@@ -1,0 +1,18 @@
+{
+  "schema_version": "qualification-toolchain/v1",
+  "skill_validator": {
+    "name": "skill-validator",
+    "version": "1.6.0",
+    "repository": "https://github.com/agent-ecosystem/skill-validator",
+    "tag": "v1.6.0",
+    "commit": "714d4c8565f5b71d0efff0c0c190b1b49022549",
+    "install": "go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0"
+  },
+  "mcp_conformance": {
+    "package": "@modelcontextprotocol/conformance",
+    "version": "0.2.0-alpha.11",
+    "repository": "https://github.com/modelcontextprotocol/conformance",
+    "requirements_anchor": "@modelcontextprotocol/conformance@0.2.0-alpha.10",
+    "install": "npm install --global --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11"
+  }
+}

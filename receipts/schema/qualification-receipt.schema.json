@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://anazeez.github.io/agent-capability-qualification/schemas/qualification-receipt/v1.json",
+  "title": "Qualification receipt",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "qualification", "status", "subject", "tool", "checks"],
+  "properties": {
+    "schema_version": {"const": "qualification-receipt/v1"},
+    "qualification": {"enum": ["skill-admission", "mcp-conformance"]},
+    "status": {"enum": ["passed", "failed", "skipped", "unavailable"]},
+    "subject": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string"},
+        "id": {"type": "string"}
+      }
+    },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"enum": ["passed", "failed", "skipped", "unavailable"]}
+        }
+      }
+    }
+  }
+}

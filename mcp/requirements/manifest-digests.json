@@ -1,0 +1,8 @@
+{
+  "schema_version": "mcp-requirements-digests/v1",
+  "anchor": "@modelcontextprotocol/conformance@0.2.0-alpha.10",
+  "sha256": {
+    "2025-11-25.yaml": "f07bb58b8b0ee5fb164d13583796b85a6a3c5042103f9b7d05676dff0c02c4e5",
+    "2026-07-28.yaml": "32a249224838017c7e1f19f36b57a94d7ed0a22f8ea60abc9da6043c23fea390"
+  }
+}

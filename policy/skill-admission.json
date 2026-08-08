@@ -1,0 +1,24 @@
+{
+  "schema_version": "skill-admission-policy/v1",
+  "policy_id": "skill-admission/v1",
+  "validator": {
+    "name": "skill-validator",
+    "version": "1.6.0",
+    "strict": true,
+    "command": ["check", "--strict", "-o", "json"]
+  },
+  "thresholds": {
+    "max_total_tokens": 5000,
+    "max_file_tokens": 5000
+  },
+  "structure": {
+    "allowed_directories": ["scripts", "references", "assets"],
+    "require_skill_md": true,
+    "reject_symlink_escape": true,
+    "reject_broken_references": true
+  },
+  "llm_judge": {
+    "enabled": false,
+    "authority": "advisory"
+  }
+}

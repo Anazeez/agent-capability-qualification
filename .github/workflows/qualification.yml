@@ -1,0 +1,90 @@
+name: Capability qualification
+
+on:
+  workflow_call:
+    inputs:
+      skill-path:
+        description: Relative path to a skill package to admit.
+        required: false
+        type: string
+        default: ""
+      mcp-profile:
+        description: Repository-relative MCP profile JSON.
+        required: false
+        type: string
+        default: ""
+      mcp-endpoint:
+        description: MCP endpoint for a server profile.
+        required: false
+        type: string
+        default: ""
+      mcp-client-command:
+        description: Command for a client profile.
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  deterministic-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m unittest discover -s tests -v
+
+  skill-admission:
+    if: inputs.skill-path != ''
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.5"
+      - run: go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0
+      - run: |
+          mkdir -p artifacts
+          python3 scripts/qualify_skill.py \
+            --skill-dir "${{ inputs.skill-path }}" \
+            --receipt artifacts/skill-receipt.json
+          python3 scripts/validate_receipt.py \
+            receipts/schema/qualification-receipt.schema.json \
+            artifacts/skill-receipt.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skill-qualification-receipt
+          path: artifacts/skill-receipt.json
+
+  mcp-qualification:
+    if: inputs.mcp-profile != ''
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.18.0"
+      - run: npm install --global --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11
+      - run: |
+          mkdir -p artifacts
+          args=(--profile "${{ inputs.mcp-profile }}" --receipt artifacts/mcp-receipt.json)
+          if [ -n "${{ inputs.mcp-endpoint }}" ]; then
+            args+=(--endpoint "${{ inputs.mcp-endpoint }}")
+          fi
+          if [ -n "${{ inputs.mcp-client-command }}" ]; then
+            args+=(--client-command "${{ inputs.mcp-client-command }}")
+          fi
+          python3 scripts/qualify_mcp.py "${args[@]}"
+          python3 scripts/validate_receipt.py \
+            receipts/schema/qualification-receipt.schema.json \
+            artifacts/mcp-receipt.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcp-qualification-receipt
+          path: artifacts/mcp-receipt.json

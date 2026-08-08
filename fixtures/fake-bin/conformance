@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+printf '%s\n' "$*" | grep -q -- '--requirements' || { echo "missing --requirements" >&2; exit 2; }
+printf '%s\n' "$*" | grep -q -- '--expected-failures' || { echo "missing --expected-failures" >&2; exit 2; }
+exit "$(printenv FAKE_CONFORMANCE_EXIT 2>/dev/null || echo 0)"

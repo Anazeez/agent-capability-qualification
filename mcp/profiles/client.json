@@ -1,0 +1,12 @@
+{
+  "schema_version": "mcp-qualification-profile/v1",
+  "profile_id": "mcp-client/v1",
+  "role": "client",
+  "revisions": ["2025-11-25", "2026-07-28"],
+  "requirements_root": "mcp/requirements",
+  "expected_failures_root": "mcp/expected-failures/client",
+  "baseline_files": {
+    "2025-11-25": "mcp/expected-failures/client/2025-11-25.yaml",
+    "2026-07-28": "mcp/expected-failures/client/2026-07-28.yaml"
+  }
+}

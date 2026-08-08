@@ -1,0 +1,14 @@
+{
+  "schema_version": "mcp-compatibility/v1",
+  "revisions": {
+    "2025-11-25": {
+      "wire_lifecycle": "stateful-initialize",
+      "requirements": "mcp/requirements/2025-11-25.yaml"
+    },
+    "2026-07-28": {
+      "wire_lifecycle": "stateless-per-request-meta",
+      "requirements": "mcp/requirements/2026-07-28.yaml"
+    }
+  },
+  "claim_rule": "A client or server claiming both revisions must pass both frozen requirement sets independently."
+}
