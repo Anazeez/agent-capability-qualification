@@ -9,6 +9,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.skill_identity import identity_for_skill
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
@@ -27,6 +29,39 @@ class QualificationHarnessTests(unittest.TestCase):
 
     def read_receipt(self, path: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
+
+    def test_skill_identity_digests_are_deterministic_and_package_sensitive(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            (package / "scripts").mkdir(parents=True)
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            (package / "scripts/run.sh").write_text("original", encoding="utf-8")
+            (package / "package.json").write_text('{"dependencies":{"demo":"1"}}', encoding="utf-8")
+
+            first = identity_for_skill(package, source_revision="source-1")
+            second = identity_for_skill(package, source_revision="source-1")
+            self.assertEqual(first, second)
+
+            (package / "scripts/run.sh").write_text("changed", encoding="utf-8")
+            changed_package = identity_for_skill(package, source_revision="source-1")
+            self.assertEqual(first["instruction_digest"], changed_package["instruction_digest"])
+            self.assertNotEqual(first["package_tree_digest"], changed_package["package_tree_digest"])
+
+            (package / "package.json").write_text('{"dependencies":{"demo":"2"}}', encoding="utf-8")
+            changed_dependency = identity_for_skill(package, source_revision="source-1")
+            self.assertNotEqual(changed_package["dependency_digest"], changed_dependency["dependency_digest"])
+
+    def test_skill_identity_rejects_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            target = Path(temp) / "outside.txt"
+            target.write_text("outside", encoding="utf-8")
+            (package / "linked.txt").symlink_to(target)
+
+            with self.assertRaises(ValueError):
+                identity_for_skill(package, source_revision="source-1")
 
     def test_skill_pass_is_deterministic_and_receipt_validates(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
