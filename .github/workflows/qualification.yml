@@ -8,6 +8,11 @@ on:
         required: false
         type: string
         default: ""
+      qualification-index:
+        description: Optional JSON index of prior passed skill qualification records.
+        required: false
+        type: string
+        default: ""
       mcp-profile:
         description: Repository-relative MCP profile JSON.
         required: false
@@ -48,9 +53,11 @@ jobs:
       - run: go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0
       - run: |
           mkdir -p artifacts
-          python3 scripts/qualify_skill.py \
-            --skill-dir "${{ inputs.skill-path }}" \
-            --receipt artifacts/skill-receipt.json
+          args=(--skill-dir "${{ inputs.skill-path }}" --receipt artifacts/skill-receipt.json)
+          if [ -n "${{ inputs.qualification-index }}" ]; then
+            args+=(--qualification-index "${{ inputs.qualification-index }}")
+          fi
+          python3 scripts/qualify_skill.py "${args[@]}"
           python3 scripts/validate_receipt.py \
             receipts/schema/qualification-receipt.schema.json \
             artifacts/skill-receipt.json
