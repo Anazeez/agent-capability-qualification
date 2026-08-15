@@ -5,3 +5,4 @@ artifacts/
 results/
 .venv/
 .mypy_cache/
+.worktrees/

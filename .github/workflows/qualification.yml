@@ -2,14 +2,23 @@ name: Capability qualification
 
 on:
   workflow_call:
+    secrets:
+      qualification-index-key:
+        description: HMAC key for trusted qualification-index records.
+        required: false
     inputs:
       skill-path:
         description: Relative path to a skill package to admit.
         required: false
         type: string
         default: ""
+      qualification-index:
+        description: Repository-relative path to an optional signed qualification index.
+        required: false
+        type: string
+        default: ""
       mcp-profile:
-        description: Repository-relative MCP profile JSON.
+        description: Repository-relative path to an MCP profile JSON.
         required: false
         type: string
         default: ""
@@ -48,12 +57,18 @@ jobs:
       - run: go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0
       - run: |
           mkdir -p artifacts
-          python3 scripts/qualify_skill.py \
-            --skill-dir "${{ inputs.skill-path }}" \
-            --receipt artifacts/skill-receipt.json
+          args=(--skill-dir "$SKILL_PATH" --receipt artifacts/skill-receipt.json --qualification-index-root "$GITHUB_WORKSPACE")
+          if [ -n "$QUALIFICATION_INDEX" ]; then
+            args+=(--qualification-index "$QUALIFICATION_INDEX")
+          fi
+          python3 scripts/qualify_skill.py "${args[@]}"
           python3 scripts/validate_receipt.py \
             receipts/schema/qualification-receipt.schema.json \
             artifacts/skill-receipt.json
+        env:
+          QUALIFICATION_INDEX: ${{ inputs.qualification-index }}
+          QUALIFICATION_INDEX_KEY: ${{ secrets.qualification-index-key }}
+          SKILL_PATH: ${{ inputs.skill-path }}
       - uses: actions/upload-artifact@v4
         with:
           name: skill-qualification-receipt
@@ -73,17 +88,21 @@ jobs:
       - run: npm install --global --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11
       - run: |
           mkdir -p artifacts
-          args=(--profile "${{ inputs.mcp-profile }}" --receipt artifacts/mcp-receipt.json)
-          if [ -n "${{ inputs.mcp-endpoint }}" ]; then
-            args+=(--endpoint "${{ inputs.mcp-endpoint }}")
+          args=(--profile "$MCP_PROFILE" --receipt artifacts/mcp-receipt.json)
+          if [ -n "$MCP_ENDPOINT" ]; then
+            args+=(--endpoint "$MCP_ENDPOINT")
           fi
-          if [ -n "${{ inputs.mcp-client-command }}" ]; then
-            args+=(--client-command "${{ inputs.mcp-client-command }}")
+          if [ -n "$MCP_CLIENT_COMMAND" ]; then
+            args+=(--client-command "$MCP_CLIENT_COMMAND")
           fi
           python3 scripts/qualify_mcp.py "${args[@]}"
           python3 scripts/validate_receipt.py \
             receipts/schema/qualification-receipt.schema.json \
             artifacts/mcp-receipt.json
+        env:
+          MCP_CLIENT_COMMAND: ${{ inputs.mcp-client-command }}
+          MCP_ENDPOINT: ${{ inputs.mcp-endpoint }}
+          MCP_PROFILE: ${{ inputs.mcp-profile }}
       - uses: actions/upload-artifact@v4
         with:
           name: mcp-qualification-receipt

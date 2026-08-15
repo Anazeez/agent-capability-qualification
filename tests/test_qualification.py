@@ -8,6 +8,10 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
+
+from scripts.qualification_index import qualification_index_signature
+from scripts.skill_identity import identity_for_skill, list_regular_file_records
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +31,312 @@ class QualificationHarnessTests(unittest.TestCase):
 
     def read_receipt(self, path: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
+
+    def test_skill_identity_digests_are_deterministic_and_package_sensitive(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            (package / "scripts").mkdir(parents=True)
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            (package / "scripts/run.sh").write_text("original", encoding="utf-8")
+            (package / "package.json").write_text('{"dependencies":{"demo":"1"}}', encoding="utf-8")
+
+            first = identity_for_skill(package, source_revision="source-1")
+            second = identity_for_skill(package, source_revision="source-1")
+            self.assertEqual(first, second)
+
+            (package / "scripts/run.sh").write_text("changed", encoding="utf-8")
+            changed_package = identity_for_skill(package, source_revision="source-1")
+            self.assertEqual(first["instruction_digest"], changed_package["instruction_digest"])
+            self.assertNotEqual(first["package_tree_digest"], changed_package["package_tree_digest"])
+
+            (package / "scripts/run.sh").chmod(0o755)
+            changed_mode = identity_for_skill(package, source_revision="source-1")
+            self.assertNotEqual(changed_package["package_tree_digest"], changed_mode["package_tree_digest"])
+
+            (package / "package.json").write_text('{"dependencies":{"demo":"2"}}', encoding="utf-8")
+            changed_dependency = identity_for_skill(package, source_revision="source-1")
+            self.assertNotEqual(changed_package["dependency_digest"], changed_dependency["dependency_digest"])
+
+    def test_skill_identity_rejects_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            target = Path(temp) / "outside.txt"
+            target.write_text("outside", encoding="utf-8")
+            (package / "linked.txt").symlink_to(target)
+
+            with self.assertRaises(ValueError):
+                identity_for_skill(package, source_revision="source-1")
+
+    def test_skill_identity_fails_on_walk_errors(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+
+            def failing_walk(_root, *, onerror, **_kwargs):
+                onerror(OSError("package traversal failed"))
+                return iter(())
+
+            with mock.patch("scripts.skill_identity.os.walk", side_effect=failing_walk):
+                with self.assertRaises(OSError):
+                    list_regular_file_records(package)
+
+    def test_skill_identity_rejects_symlinked_parent_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as outside:
+            actual_parent = Path(outside) / "actual"
+            package = actual_parent / "skill"
+            package.mkdir(parents=True)
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            parent_alias = Path(temp) / "alias"
+            parent_alias.symlink_to(actual_parent, target_is_directory=True)
+
+            with self.assertRaises(ValueError):
+                identity_for_skill(parent_alias / "skill", source_revision="source-1")
+
+    def test_skill_qualification_reuses_complete_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "prior-valid",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
+            index.write_text(
+                json.dumps({"records": [record]}),
+                encoding="utf-8",
+            )
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--source-revision", "fixture-source",
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
+            )
+
+            self.assertEqual(run.returncode, 0, run.stderr)
+            value = self.read_receipt(receipt)
+            reuse = next(item for item in value["checks"] if item["id"] == "qualification-reuse")
+            self.assertEqual(reuse["status"], "passed")
+            self.assertEqual(reuse["scope"], "qualification")
+
+    def test_instruction_match_does_not_skip_qualification(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            identity["package_tree_digest"] = "f" * 64
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "instruction-only",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
+            index.write_text(
+                json.dumps({"records": [record]}),
+                encoding="utf-8",
+            )
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--source-revision", "fixture-source",
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            dedup = next(item for item in value["checks"] if item["id"] == "qualification-dedup")
+            self.assertEqual(dedup["status"], "passed")
+            self.assertEqual(dedup["scope"], "instruction-analysis")
+            self.assertEqual(next(item for item in value["checks"] if item["id"] == "token-threshold")["status"], "failed")
+
+    def test_untrusted_qualification_index_cannot_skip_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            index.write_text(
+                json.dumps({"records": [{
+                    "record_id": "forged",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "identity": identity,
+                }]}),
+                encoding="utf-8",
+            )
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--source-revision", "fixture-source",
+                env={"FAKE_VALIDATOR_TOKENS": "5001"},
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
+
+    def test_qualification_index_requires_valid_signature_and_tool(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+
+            for record in (
+                {
+                    "record_id": "invalid-signature",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "tool": tool,
+                    "identity": identity,
+                    "signature": "0" * 64,
+                },
+                {
+                    "record_id": "stale-tool",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "tool": {**tool, "commit": "0" * 40},
+                    "identity": identity,
+                },
+            ):
+                if "signature" not in record:
+                    record["signature"] = qualification_index_signature(record, index_key)
+                index.write_text(json.dumps({"records": [record]}), encoding="utf-8")
+                receipt = Path(temp) / f"{record['record_id']}.json"
+                run = self.run_script(
+                    "qualify_skill.py",
+                    "--skill-dir", str(skill_dir),
+                    "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                    "--receipt", str(receipt),
+                    "--qualification-index", str(index),
+                    "--source-revision", "fixture-source",
+                    env={
+                        "FAKE_VALIDATOR_TOKENS": "5001",
+                        "QUALIFICATION_INDEX_KEY": index_key,
+                    },
+                )
+
+                self.assertEqual(run.returncode, 1, record["record_id"])
+                value = self.read_receipt(receipt)
+                self.assertNotIn(
+                    "qualification-reuse",
+                    {item["id"] for item in value["checks"]},
+                )
+
+    def test_workflow_index_root_rejects_outside_index(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "outside-root",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
+            index.write_text(json.dumps({"records": [record]}), encoding="utf-8")
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--qualification-index-root", str(ROOT),
+                "--source-revision", "fixture-source",
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
+
+    def test_malformed_qualification_index_falls_back_to_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            index.write_text("not json", encoding="utf-8")
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(ROOT / "fixtures/skills/valid"),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+            )
+
+            self.assertEqual(run.returncode, 0, run.stderr)
+            value = self.read_receipt(receipt)
+            self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
+
+    def test_skill_qualification_rejects_symlinked_package_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            package_alias = Path(temp) / "skill-alias"
+            package_alias.symlink_to(package, target_is_directory=True)
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(package_alias),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            self.assertEqual(value["checks"][0]["id"], "package-identity")
 
     def test_skill_pass_is_deterministic_and_receipt_validates(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

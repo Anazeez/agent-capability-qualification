@@ -62,6 +62,46 @@ python3 scripts/validate_receipt.py receipts/schema/qualification-receipt.schema
 Receipts are evidence for the governor. A passing receipt is not itself an
 admission or promotion decision.
 
+## Qualification deduplication
+
+Skill receipts include four deterministic identity fields:
+
+- `instruction_digest`: exact `SKILL.md` content;
+- `package_tree_digest`: every regular package file, relative path, and mode;
+- `dependency_digest`: recognized dependency manifests and lockfiles;
+- `source_revision`: the supplied source revision, Git revision, or
+  `unversioned`.
+
+The skill adapter accepts an optional local qualification index before invoking
+the validator:
+
+```bash
+python3 scripts/qualify_skill.py \
+  --skill-dir /path/to/skill \
+  --policy policy/skill-admission.json \
+  --qualification-index artifacts/qualification-index.json \
+  --receipt artifacts/skill-receipt.json
+```
+
+The index is a JSON object with a `records` array. A record can reuse passed
+qualification evidence only when `status` is `passed`, its HMAC `signature`
+verifies with the `QUALIFICATION_INDEX_KEY` environment secret, its pinned
+validator `tool` (`name`, `version`, and `commit`) matches the current
+toolchain, `source_revision` matches, `policy_sha256` equals the current
+policy digest, and both `package_tree_digest` and `dependency_digest` match. A matching
+`instruction_digest` alone is recorded as reusable instruction analysis but
+never skips package qualification. Records without a valid key/signature or
+matching tool identity fall back to fresh validation. Malformed or unreadable
+indexes also fall back to fresh validation. Symlinked package content is
+rejected during identity construction.
+
+The reusable workflow exposes the same file as the optional
+`qualification-index` input and accepts the optional
+`qualification-index-key` secret used to verify signatures. The index is
+advisory evidence only; it grants no admission or promotion authority. In the
+workflow, the index is additionally required to resolve beneath the checked-out
+workspace root.
+
 ## CI interface
 
 `.github/workflows/qualification.yml` is a reusable workflow. Callers provide
