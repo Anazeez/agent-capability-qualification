@@ -154,6 +154,25 @@ class QualificationHarnessTests(unittest.TestCase):
             value = self.read_receipt(receipt)
             self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
 
+    def test_skill_qualification_rejects_symlinked_package_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            package_alias = Path(temp) / "skill-alias"
+            package_alias.symlink_to(package, target_is_directory=True)
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(package_alias),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            self.assertEqual(value["checks"][0]["id"], "package-identity")
+
     def test_skill_pass_is_deterministic_and_receipt_validates(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             receipt = Path(temp) / "skill.json"

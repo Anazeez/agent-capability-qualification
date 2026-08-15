@@ -90,6 +90,7 @@ def main() -> int:
     policy = load_json(args.policy)
     versions = load_json(ROOT / "tools/versions.json")
     expected_version = policy["validator"]["version"]
+    skill_input_dir = args.skill_dir
     skill_dir = args.skill_dir.resolve()
     checks: list[dict[str, Any]] = []
     unavailable = False
@@ -97,7 +98,7 @@ def main() -> int:
     policy_sha256 = sha256_file(args.policy)
 
     try:
-        identity = identity_for_skill(skill_dir, args.source_revision)
+        identity = identity_for_skill(skill_input_dir, args.source_revision)
     except (OSError, ValueError) as error:
         checks.append(result("failed", "package-identity", str(error)))
         receipt = {
