@@ -147,34 +147,48 @@ def main() -> int:
         print(json.dumps(receipt, indent=2, sort_keys=True))
         return exit_code("failed")
 
-    reuse_check = find_reuse_check(
-        args.qualification_index,
-        identity,
-        policy_sha256,
-        validator_tool,
-        index_key,
-    )
-    if reuse_check is not None:
-        checks.append(reuse_check)
+    version_ok = False
+    try:
+        version_run = subprocess.run(
+            [args.validator_bin, "--version"],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=validator_env,
+        )
+        version_text = (version_run.stdout + version_run.stderr).strip()
+        version_ok = version_run.returncode == 0 and re.search(
+            rf"(?<![0-9])v?{re.escape(expected_version)}(?![0-9])",
+            version_text,
+        ) is not None
+        checks.append(result(
+            "passed" if version_ok else "failed",
+            "validator-version",
+            version_text or "no version output",
+        ))
+    except FileNotFoundError:
+        checks.append(result(
+            "unavailable",
+            "validator-version",
+            f"executable not found: {args.validator_bin}",
+        ))
+        unavailable = True
 
-    if reuse_check is None or reuse_check["id"] != "qualification-reuse":
-        try:
-            version_run = subprocess.run(
-                [args.validator_bin, "--version"],
-                capture_output=True,
-                text=True,
-                check=False,
-                env=validator_env,
-            )
-            version_text = (version_run.stdout + version_run.stderr).strip()
-            version_ok = version_run.returncode == 0 and re.search(rf"(?<![0-9])v?{re.escape(expected_version)}(?![0-9])", version_text)
-            checks.append(result("passed" if version_ok else "failed", "validator-version", version_text or "no version output"))
-        except FileNotFoundError:
-            checks.append(result("unavailable", "validator-version", f"executable not found: {args.validator_bin}"))
-            unavailable = True
-            version_text = ""
+    reuse_check = None
+    if not unavailable and version_ok:
+        reuse_check = find_reuse_check(
+            args.qualification_index,
+            identity,
+            policy_sha256,
+            validator_tool,
+            index_key,
+        )
+        if reuse_check is not None:
+            checks.append(reuse_check)
 
-    if not unavailable and (reuse_check is None or reuse_check["id"] != "qualification-reuse"):
+    if not unavailable and (
+        reuse_check is None or reuse_check["id"] != "qualification-reuse"
+    ):
         command = [args.validator_bin, *policy["validator"]["command"], str(skill_dir)]
         run = subprocess.run(
             command,
@@ -206,6 +220,22 @@ def main() -> int:
             total_tokens=sum(file_tokens) if file_tokens else None,
             max_file_tokens=max(file_tokens) if file_tokens else None,
         ))
+
+    try:
+        final_identity = identity_for_skill(skill_input_dir, args.source_revision)
+    except (OSError, ValueError) as error:
+        checks.append(result(
+            "failed",
+            "package-identity",
+            f"skill package changed or became unavailable: {error}",
+        ))
+    else:
+        if final_identity != identity:
+            checks.append(result(
+                "failed",
+                "package-identity",
+                "skill package changed during qualification",
+            ))
 
     status = "unavailable" if unavailable else ("passed" if all(check["status"] == "passed" for check in checks) else "failed")
     receipt = {
