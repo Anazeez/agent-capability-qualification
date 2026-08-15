@@ -98,7 +98,9 @@ rejected during identity construction.
 The reusable workflow exposes the same file as the optional
 `qualification-index` input and accepts the optional
 `qualification-index-key` secret used to verify signatures. The index is
-advisory evidence only; it grants no admission or promotion authority.
+advisory evidence only; it grants no admission or promotion authority. In the
+workflow, the index is additionally required to resolve beneath the checked-out
+workspace root.
 
 ## CI interface
 

@@ -40,6 +40,7 @@ def find_reuse_check(
     policy_sha256: str,
     validator_tool: dict[str, str],
     index_key: str | None,
+    index_root: Path | None,
 ) -> dict[str, Any] | None:
     if (
         index_path is None
@@ -47,6 +48,16 @@ def find_reuse_check(
         or len(index_key.encode("utf-8")) < 32
     ):
         return None
+    if index_root is not None:
+        try:
+            if index_path.is_symlink():
+                return None
+            resolved_index = index_path.resolve(strict=True)
+            resolved_root = index_root.resolve(strict=True)
+            resolved_index.relative_to(resolved_root)
+            index_path = resolved_index
+        except (OSError, RuntimeError, ValueError):
+            return None
     try:
         payload = load_json(index_path)
     except (OSError, ValueError):
@@ -109,6 +120,7 @@ def main() -> int:
     parser.add_argument("--validator-bin", default="skill-validator")
     parser.add_argument("--receipt", required=True, type=Path)
     parser.add_argument("--qualification-index", type=Path)
+    parser.add_argument("--qualification-index-root", type=Path)
     parser.add_argument("--source-revision")
     args = parser.parse_args()
 
@@ -182,6 +194,7 @@ def main() -> int:
             policy_sha256,
             validator_tool,
             index_key,
+            args.qualification_index_root,
         )
         if reuse_check is not None:
             checks.append(reuse_check)

@@ -212,6 +212,96 @@ class QualificationHarnessTests(unittest.TestCase):
             value = self.read_receipt(receipt)
             self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
 
+    def test_qualification_index_requires_valid_signature_and_tool(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+
+            for record in (
+                {
+                    "record_id": "invalid-signature",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "tool": tool,
+                    "identity": identity,
+                    "signature": "0" * 64,
+                },
+                {
+                    "record_id": "stale-tool",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "tool": {**tool, "commit": "0" * 40},
+                    "identity": identity,
+                },
+            ):
+                if "signature" not in record:
+                    record["signature"] = qualification_index_signature(record, index_key)
+                index.write_text(json.dumps({"records": [record]}), encoding="utf-8")
+                receipt = Path(temp) / f"{record['record_id']}.json"
+                run = self.run_script(
+                    "qualify_skill.py",
+                    "--skill-dir", str(skill_dir),
+                    "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                    "--receipt", str(receipt),
+                    "--qualification-index", str(index),
+                    "--source-revision", "fixture-source",
+                    env={
+                        "FAKE_VALIDATOR_TOKENS": "5001",
+                        "QUALIFICATION_INDEX_KEY": index_key,
+                    },
+                )
+
+                self.assertEqual(run.returncode, 1, record["record_id"])
+                value = self.read_receipt(receipt)
+                self.assertNotIn(
+                    "qualification-reuse",
+                    {item["id"] for item in value["checks"]},
+                )
+
+    def test_workflow_index_root_rejects_outside_index(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "outside-root",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
+            index.write_text(json.dumps({"records": [record]}), encoding="utf-8")
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--qualification-index-root", str(ROOT),
+                "--source-revision", "fixture-source",
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
+
     def test_malformed_qualification_index_falls_back_to_validation(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             index = Path(temp) / "qualification-index.json"

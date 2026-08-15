@@ -66,6 +66,8 @@ skill package
 
 The index is advisory evidence, never permission to admit or promote a skill.
 The HMAC key is a trust-boundary secret; without it, index reuse is disabled.
+Workflow callers additionally pass a checkout root, and index reuse is
+disabled when the resolved index is outside that root or is itself a symlink.
 The existing validator, policy, and governor boundaries remain authoritative.
 
 ## Error handling and security

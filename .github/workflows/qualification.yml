@@ -57,7 +57,7 @@ jobs:
       - run: go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0
       - run: |
           mkdir -p artifacts
-          args=(--skill-dir "$SKILL_PATH" --receipt artifacts/skill-receipt.json)
+          args=(--skill-dir "$SKILL_PATH" --receipt artifacts/skill-receipt.json --qualification-index-root "$GITHUB_WORKSPACE")
           if [ -n "$QUALIFICATION_INDEX" ]; then
             args+=(--qualification-index "$QUALIFICATION_INDEX")
           fi
