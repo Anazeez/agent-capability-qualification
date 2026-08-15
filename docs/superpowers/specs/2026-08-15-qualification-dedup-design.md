@@ -15,6 +15,8 @@ This change is limited to the `agent-capability-qualification` repository:
   emits identity evidence in the existing receipt.
 - `tests/test_qualification.py` covers identity, reuse, and fail-closed cases.
 - `README.md` documents the local qualification-index format and invocation.
+- `.github/workflows/qualification.yml` forwards an optional index to the
+  skill-admission job.
 
 The change does not modify Patronus MCPs, the deep workflow, ReverseSum, or
 the Jcode/Ponytail/local-AI automatic starter and routing gate. It does not add
