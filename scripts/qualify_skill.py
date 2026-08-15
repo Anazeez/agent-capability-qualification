@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hmac
 import json
+import os
 import re
 import subprocess
 import sys
@@ -13,6 +15,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from receipt import sha256_file, write_receipt  # noqa: E402
+from qualification_index import qualification_index_signature  # noqa: E402
 from skill_identity import identity_for_skill  # noqa: E402
 
 
@@ -35,8 +38,14 @@ def find_reuse_check(
     index_path: Path | None,
     identity: dict[str, str],
     policy_sha256: str,
+    validator_tool: dict[str, str],
+    index_key: str | None,
 ) -> dict[str, Any] | None:
-    if index_path is None:
+    if (
+        index_path is None
+        or index_key is None
+        or len(index_key.encode("utf-8")) < 32
+    ):
         return None
     try:
         payload = load_json(index_path)
@@ -49,8 +58,23 @@ def find_reuse_check(
     for record in payload["records"]:
         if not isinstance(record, dict) or record.get("status") != "passed":
             continue
+        signature = record.get("signature")
+        if (
+            not isinstance(signature, str)
+            or not hmac.compare_digest(
+                signature,
+                qualification_index_signature(record, index_key),
+            )
+        ):
+            continue
         record_identity = record.get("identity")
         if not isinstance(record_identity, dict):
+            continue
+        record_tool = record.get("tool")
+        if not isinstance(record_tool, dict) or any(
+            record_tool.get(field) != validator_tool.get(field)
+            for field in ("name", "version", "commit")
+        ):
             continue
         if record_identity.get("instruction_digest") == identity["instruction_digest"]:
             instruction_match = True
@@ -58,6 +82,7 @@ def find_reuse_check(
             record.get("policy_sha256") == policy_sha256
             and record_identity.get("package_tree_digest") == identity["package_tree_digest"]
             and record_identity.get("dependency_digest") == identity["dependency_digest"]
+            and record_identity.get("source_revision") == identity["source_revision"]
         ):
             return result(
                 "passed",
@@ -96,6 +121,10 @@ def main() -> int:
     unavailable = False
     validation_payload: dict[str, Any] = {}
     policy_sha256 = sha256_file(args.policy)
+    validator_tool = versions["skill_validator"]
+    index_key = os.environ.get("QUALIFICATION_INDEX_KEY")
+    validator_env = os.environ.copy()
+    validator_env.pop("QUALIFICATION_INDEX_KEY", None)
 
     try:
         identity = identity_for_skill(skill_input_dir, args.source_revision)
@@ -118,14 +147,24 @@ def main() -> int:
         print(json.dumps(receipt, indent=2, sort_keys=True))
         return exit_code("failed")
 
-    reuse_check = find_reuse_check(args.qualification_index, identity, policy_sha256)
+    reuse_check = find_reuse_check(
+        args.qualification_index,
+        identity,
+        policy_sha256,
+        validator_tool,
+        index_key,
+    )
     if reuse_check is not None:
         checks.append(reuse_check)
 
     if reuse_check is None or reuse_check["id"] != "qualification-reuse":
         try:
             version_run = subprocess.run(
-                [args.validator_bin, "--version"], capture_output=True, text=True, check=False
+                [args.validator_bin, "--version"],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=validator_env,
             )
             version_text = (version_run.stdout + version_run.stderr).strip()
             version_ok = version_run.returncode == 0 and re.search(rf"(?<![0-9])v?{re.escape(expected_version)}(?![0-9])", version_text)
@@ -137,7 +176,13 @@ def main() -> int:
 
     if not unavailable and (reuse_check is None or reuse_check["id"] != "qualification-reuse"):
         command = [args.validator_bin, *policy["validator"]["command"], str(skill_dir)]
-        run = subprocess.run(command, capture_output=True, text=True, check=False)
+        run = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+            env=validator_env,
+        )
         try:
             validation_payload = json.loads(run.stdout)
         except json.JSONDecodeError:
@@ -169,9 +214,9 @@ def main() -> int:
         "status": status,
         "subject": {"type": "skill-package", "id": str(skill_dir)},
         "tool": {
-            "name": versions["skill_validator"]["name"],
-            "version": versions["skill_validator"]["version"],
-            "commit": versions["skill_validator"]["commit"],
+            "name": validator_tool["name"],
+            "version": validator_tool["version"],
+            "commit": validator_tool["commit"],
         },
         "policy": {"id": policy["policy_id"], "sha256": policy_sha256},
         "identity": identity,

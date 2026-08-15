@@ -29,7 +29,7 @@ produces canonical SHA-256 digests:
 
 1. `instruction_digest` is the exact byte digest of `SKILL.md`.
 2. `package_tree_digest` is the digest of a sorted manifest containing every
-   regular package file's POSIX relative path and bytes.
+   regular package file's POSIX relative path, mode, and bytes.
 3. `dependency_digest` is the digest of sorted recognized dependency
    manifest/lock files and their bytes; an absent dependency set has a stable
    empty digest.
@@ -42,14 +42,16 @@ identity; the second makes dependency changes visible to reuse policy and
 future qualification indexes.
 
 `qualify_skill.py` accepts an optional JSON qualification index. An index record
-may reuse a prior passed qualification only when its package-tree digest,
-dependency digest, and policy digest match the current subject. A matching
-instruction digest alone is emitted as `instruction-analysis` reuse metadata
-but never suppresses the validator. If the index is malformed, unreadable, or
-contains no matching passed record, the script proceeds with normal validation
-and records no reuse. A complete match skips the expensive validator while
-still emitting a normal `qualification-receipt/v1` receipt with identity and a
-`qualification-reuse` check.
+may reuse a prior passed qualification only when its HMAC signature verifies
+with a locally supplied secret, its pinned validator name, version, and commit
+match, its source revision matches, and its package-tree digest, dependency
+digest, and policy digest match the current subject. A matching instruction digest alone is emitted as
+`instruction-analysis` reuse metadata but never suppresses the validator. If
+the index is malformed, unreadable, unsigned, or contains no matching passed
+record, the script proceeds with normal validation and records no reuse. A
+complete match skips the expensive validator while still emitting a normal
+`qualification-receipt/v1` receipt with identity and a `qualification-reuse`
+check.
 
 ## Data flow
 
@@ -63,12 +65,13 @@ skill package
 ```
 
 The index is advisory evidence, never permission to admit or promote a skill.
+The HMAC key is a trust-boundary secret; without it, index reuse is disabled.
 The existing validator, policy, and governor boundaries remain authoritative.
 
 ## Error handling and security
 
-- Missing `SKILL.md`, path escapes, symlinks, unreadable files, malformed JSON,
-  and invalid index records fail closed for reuse.
+- Missing `SKILL.md`, path escapes, symlinks, unreadable files, traversal
+  errors, malformed JSON, and invalid index records fail closed for reuse.
 - A reuse-index failure must not turn a valid fresh qualification into a
   failure; it simply causes the normal validator path to run.
 - The package walk uses `lstat` and rejects symlinks rather than resolving

@@ -14,7 +14,7 @@
 - Do not add a registry, database, network lookup, governance engine, or third-party dependency.
 - Preserve `qualification-receipt/v1` and fail closed for identity construction and reuse decisions.
 - Matching `instruction_digest` alone may never skip package qualification.
-- A complete reuse match requires `package_tree_digest`, `dependency_digest`, and the current policy SHA-256 to match a prior passed record.
+- A complete reuse match requires a valid HMAC signature, matching pinned validator tool identity, `package_tree_digest`, `dependency_digest`, and current policy SHA-256 on a prior passed record.
 - Keep all changes on `feature/qualification-dedup` until final review and integration.
 
 ---

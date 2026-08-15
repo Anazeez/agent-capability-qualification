@@ -2,6 +2,10 @@ name: Capability qualification
 
 on:
   workflow_call:
+    secrets:
+      qualification-index-key:
+        description: HMAC key for trusted qualification-index records.
+        required: false
     inputs:
       skill-path:
         description: Relative path to a skill package to admit.
@@ -53,14 +57,18 @@ jobs:
       - run: go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.6.0
       - run: |
           mkdir -p artifacts
-          args=(--skill-dir "${{ inputs.skill-path }}" --receipt artifacts/skill-receipt.json)
-          if [ -n "${{ inputs.qualification-index }}" ]; then
-            args+=(--qualification-index "${{ inputs.qualification-index }}")
+          args=(--skill-dir "$SKILL_PATH" --receipt artifacts/skill-receipt.json)
+          if [ -n "$QUALIFICATION_INDEX" ]; then
+            args+=(--qualification-index "$QUALIFICATION_INDEX")
           fi
           python3 scripts/qualify_skill.py "${args[@]}"
           python3 scripts/validate_receipt.py \
             receipts/schema/qualification-receipt.schema.json \
             artifacts/skill-receipt.json
+        env:
+          QUALIFICATION_INDEX: ${{ inputs.qualification-index }}
+          QUALIFICATION_INDEX_KEY: ${{ secrets.qualification-index-key }}
+          SKILL_PATH: ${{ inputs.skill-path }}
       - uses: actions/upload-artifact@v4
         with:
           name: skill-qualification-receipt

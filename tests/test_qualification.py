@@ -8,8 +8,10 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
-from scripts.skill_identity import identity_for_skill
+from scripts.qualification_index import qualification_index_signature
+from scripts.skill_identity import identity_for_skill, list_regular_file_records
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +49,10 @@ class QualificationHarnessTests(unittest.TestCase):
             self.assertEqual(first["instruction_digest"], changed_package["instruction_digest"])
             self.assertNotEqual(first["package_tree_digest"], changed_package["package_tree_digest"])
 
+            (package / "scripts/run.sh").chmod(0o755)
+            changed_mode = identity_for_skill(package, source_revision="source-1")
+            self.assertNotEqual(changed_package["package_tree_digest"], changed_mode["package_tree_digest"])
+
             (package / "package.json").write_text('{"dependencies":{"demo":"2"}}', encoding="utf-8")
             changed_dependency = identity_for_skill(package, source_revision="source-1")
             self.assertNotEqual(changed_package["dependency_digest"], changed_dependency["dependency_digest"])
@@ -63,6 +69,31 @@ class QualificationHarnessTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 identity_for_skill(package, source_revision="source-1")
 
+    def test_skill_identity_fails_on_walk_errors(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp) / "skill"
+            package.mkdir()
+
+            def failing_walk(_root, *, onerror, **_kwargs):
+                onerror(OSError("package traversal failed"))
+                return iter(())
+
+            with mock.patch("scripts.skill_identity.os.walk", side_effect=failing_walk):
+                with self.assertRaises(OSError):
+                    list_regular_file_records(package)
+
+    def test_skill_identity_rejects_symlinked_parent_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as outside:
+            actual_parent = Path(outside) / "actual"
+            package = actual_parent / "skill"
+            package.mkdir(parents=True)
+            (package / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+            parent_alias = Path(temp) / "alias"
+            parent_alias.symlink_to(actual_parent, target_is_directory=True)
+
+            with self.assertRaises(ValueError):
+                identity_for_skill(parent_alias / "skill", source_revision="source-1")
+
     def test_skill_qualification_reuses_complete_identity(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             index = Path(temp) / "qualification-index.json"
@@ -71,15 +102,18 @@ class QualificationHarnessTests(unittest.TestCase):
             policy_sha256 = hashlib.sha256(
                 (ROOT / "policy/skill-admission.json").read_bytes()
             ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "prior-valid",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
             index.write_text(
-                json.dumps({
-                    "records": [{
-                        "record_id": "prior-valid",
-                        "status": "passed",
-                        "policy_sha256": policy_sha256,
-                        "identity": identity,
-                    }]
-                }),
+                json.dumps({"records": [record]}),
                 encoding="utf-8",
             )
             receipt = Path(temp) / "skill.json"
@@ -90,7 +124,10 @@ class QualificationHarnessTests(unittest.TestCase):
                 "--receipt", str(receipt),
                 "--qualification-index", str(index),
                 "--source-revision", "fixture-source",
-                env={"FAKE_VALIDATOR_TOKENS": "5001"},
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
             )
 
             self.assertEqual(run.returncode, 0, run.stderr)
@@ -108,15 +145,56 @@ class QualificationHarnessTests(unittest.TestCase):
             policy_sha256 = hashlib.sha256(
                 (ROOT / "policy/skill-admission.json").read_bytes()
             ).hexdigest()
+            tool = json.loads((ROOT / "tools/versions.json").read_text())["skill_validator"]
+            index_key = "qualification-index-test-key-32-bytes!"
+            record = {
+                "record_id": "instruction-only",
+                "status": "passed",
+                "policy_sha256": policy_sha256,
+                "tool": tool,
+                "identity": identity,
+            }
+            record["signature"] = qualification_index_signature(record, index_key)
             index.write_text(
-                json.dumps({
-                    "records": [{
-                        "record_id": "instruction-only",
-                        "status": "passed",
-                        "policy_sha256": policy_sha256,
-                        "identity": identity,
-                    }]
-                }),
+                json.dumps({"records": [record]}),
+                encoding="utf-8",
+            )
+            receipt = Path(temp) / "skill.json"
+            run = self.run_script(
+                "qualify_skill.py",
+                "--skill-dir", str(skill_dir),
+                "--validator-bin", str(ROOT / "fixtures/fake-bin/skill-validator"),
+                "--receipt", str(receipt),
+                "--qualification-index", str(index),
+                "--source-revision", "fixture-source",
+                env={
+                    "FAKE_VALIDATOR_TOKENS": "5001",
+                    "QUALIFICATION_INDEX_KEY": index_key,
+                },
+            )
+
+            self.assertEqual(run.returncode, 1)
+            value = self.read_receipt(receipt)
+            dedup = next(item for item in value["checks"] if item["id"] == "qualification-dedup")
+            self.assertEqual(dedup["status"], "passed")
+            self.assertEqual(dedup["scope"], "instruction-analysis")
+            self.assertEqual(next(item for item in value["checks"] if item["id"] == "token-threshold")["status"], "failed")
+
+    def test_untrusted_qualification_index_cannot_skip_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index = Path(temp) / "qualification-index.json"
+            skill_dir = ROOT / "fixtures/skills/valid"
+            identity = identity_for_skill(skill_dir, source_revision="fixture-source")
+            policy_sha256 = hashlib.sha256(
+                (ROOT / "policy/skill-admission.json").read_bytes()
+            ).hexdigest()
+            index.write_text(
+                json.dumps({"records": [{
+                    "record_id": "forged",
+                    "status": "passed",
+                    "policy_sha256": policy_sha256,
+                    "identity": identity,
+                }]}),
                 encoding="utf-8",
             )
             receipt = Path(temp) / "skill.json"
@@ -132,10 +210,7 @@ class QualificationHarnessTests(unittest.TestCase):
 
             self.assertEqual(run.returncode, 1)
             value = self.read_receipt(receipt)
-            dedup = next(item for item in value["checks"] if item["id"] == "qualification-dedup")
-            self.assertEqual(dedup["status"], "passed")
-            self.assertEqual(dedup["scope"], "instruction-analysis")
-            self.assertEqual(next(item for item in value["checks"] if item["id"] == "token-threshold")["status"], "failed")
+            self.assertNotIn("qualification-reuse", {item["id"] for item in value["checks"]})
 
     def test_malformed_qualification_index_falls_back_to_validation(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
