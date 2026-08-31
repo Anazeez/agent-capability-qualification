@@ -1,0 +1,65 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "Local MCP",
+    "provider_version": "firecrawl-developer-index@0.1.0",
+    "source_revision": "7ae1824fc74ad06deb7d022c40fa49917fb05f82",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "dependency_closure_sha256": "a96a000979af5262cf264e537f8b192ca81e5d5261bba4cee8c278e362d58062",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "drive_archive",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "drive-file:1pTyvrafvpLLDDNi4whRYAe9X-TqQ-LFj",
+    "artifact_sha256": "33dc302971fb8b05a30cd5b6e70bc64bbc5292de9401a7b6ffc14813d3eca41e",
+    "artifact_size": 10285,
+    "candidate_tree_sha256": "cc9cb3a3936f55c59b15a8b8eb73bd27bf0353936aa4afe7816803c03769e24c"
+  },
+  "dependency_closure": {
+    "required": [
+      "canonical-agent-workflow/v2",
+      "python>=3.9",
+      "stdlib-json",
+      "stdlib-urllib",
+      "universal-state-contract/v1"
+    ],
+    "available": [
+      "canonical-agent-workflow/v2",
+      "python>=3.9",
+      "stdlib-json",
+      "stdlib-urllib",
+      "universal-state-contract/v1"
+    ],
+    "lockfiles": [
+      {
+        "path": "developer_index_mcp.py",
+        "sha256": "5a234e8cc6004998347c92dc940bdb612b346f6704ce6a83263033db2c1b783a"
+      },
+      {
+        "path": "test_developer_index_state.py",
+        "sha256": "20f49c13a89064935773beb5ea330aadab481f1ac1c3a64023dde3382a145217"
+      },
+      {
+        "path": "contracts/universal-state-contract-v1.json",
+        "sha256": "09a5a8bdc34a5cbd6433c378287524a69a8b4db7801839ba2953c7f18d61b553"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "vector_count": 37,
+    "accepted_count": 10,
+    "rejected_count": 27,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

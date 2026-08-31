@@ -1,0 +1,27 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "control_stage_retry_forbidden",
+  "overlay": {
+    "control_plane": {
+      "retry": true,
+      "stages": [
+        {
+          "stage": "drive",
+          "attempts": 2
+        },
+        {
+          "stage": "judge",
+          "attempts": 0
+        },
+        {
+          "stage": "jcode",
+          "attempts": 0
+        },
+        {
+          "stage": "specialist",
+          "attempts": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "failed_docker_canary_rejected",
+  "overlay": {
+    "sandbox_canary": {
+      "status": "FAIL"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "failed_adapter_rejected",
+  "overlay": {
+    "adapter_manifest": {
+      "status": "FAIL"
+    }
+  }
+}

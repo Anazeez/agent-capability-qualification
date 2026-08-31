@@ -1,0 +1,63 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "Codex Router",
+    "provider_version": "codex-model-router@0.4.0-beta.4",
+    "source_revision": "d952b4d9081919f1228beafaaa40404199f01103",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "dependency_closure_sha256": "8d603afd0fee10546bc677b6042210addb1d99e9acf722d95c6ba05aba9d295a",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "drive_archive",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "drive-file:19WsgN9LzqN4kSLfMxoX3jRezAeSLzRFV",
+    "artifact_sha256": "fbda424de80fa20f2a2dceaa21db65d137d99cac4a5140cbd28fbc8589c58ca1",
+    "artifact_size": 3781340,
+    "candidate_tree_sha256": "42c763a0d64128a57b7fe8ced6a51db4f73b16cf57fd897118bcc09b342963e0"
+  },
+  "dependency_closure": {
+    "required": [
+      "canonical-agent-workflow/v2",
+      "node>=22.19.0",
+      "proper-lockfile@4.1.2",
+      "undici@8.10.0"
+    ],
+    "available": [
+      "canonical-agent-workflow/v2",
+      "node>=22.19.0",
+      "proper-lockfile@4.1.2",
+      "undici@8.10.0"
+    ],
+    "lockfiles": [
+      {
+        "path": "package-lock.json",
+        "sha256": "cea83b34853bed431ac878088f83ffb386d5cfb44e8ae763561478bee59868c3"
+      },
+      {
+        "path": "src/canonical-upgrade-adapter.mjs",
+        "sha256": "25c5ae2671adc4626c1a20c3aec7c1b3195b69294ad254fefc224916309d42d4"
+      },
+      {
+        "path": "contracts/canonical-upgrade-contract-v1.json",
+        "sha256": "b87dacfde8a40a0ce7a39e0e14c1c3ea0b90da49b170854310a47336829543dc"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "vector_count": 37,
+    "accepted_count": 10,
+    "rejected_count": 27,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

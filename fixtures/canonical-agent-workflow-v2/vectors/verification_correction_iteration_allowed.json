@@ -1,0 +1,50 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "verification_correction_iteration_allowed",
+  "overlay": {
+    "evidence_loop": {
+      "iterations": [
+        {
+          "iteration": 1,
+          "candidate_digest": "7777777777777777777777777777777777777777777777777777777777777777",
+          "plan_sha256": "c7ca0b7617d4d93189dbdba9c7763c3f69687f1ce895652707b94420cb8eb2d9",
+          "actions": [
+            "run focused tests"
+          ],
+          "observations": [
+            "all assertions passed"
+          ],
+          "acceptance_results": [
+            {
+              "criterion": "contract conformance",
+              "status": "PASS"
+            }
+          ],
+          "remaining_deltas": [],
+          "decision": "ACCEPT"
+        },
+        {
+          "iteration": 2,
+          "candidate_digest": "8888888888888888888888888888888888888888888888888888888888888888",
+          "plan_sha256": "c7ca0b7617d4d93189dbdba9c7763c3f69687f1ce895652707b94420cb8eb2d9",
+          "actions": [
+            "correct candidate"
+          ],
+          "observations": [
+            "delta reduced"
+          ],
+          "acceptance_results": [
+            {
+              "criterion": "contract conformance",
+              "status": "FAIL"
+            }
+          ],
+          "remaining_deltas": [
+            "one bounded delta"
+          ],
+          "decision": "CORRECT"
+        }
+      ]
+    }
+  }
+}

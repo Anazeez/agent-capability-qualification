@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "adapter_pass_not_global_pass",
+  "overlay": {
+    "adapter_manifest": {
+      "status": "PASS",
+      "global_completion_claim": false,
+      "all_required_adapters_passed": false
+    }
+  }
+}

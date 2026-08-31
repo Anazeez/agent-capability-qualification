@@ -1,0 +1,14 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "authority_effect_overlap_rejected",
+  "overlay": {
+    "authority": {
+      "allowed_effects": [
+        "read",
+        "edit",
+        "test",
+        "deploy"
+      ]
+    }
+  }
+}

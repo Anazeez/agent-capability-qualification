@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "drive_blocked_rejected",
+  "overlay": {
+    "drive_attestation": {
+      "status": "BLOCKED"
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "schema_version": "canonical-agent-workflow-vector-manifest/v2",
+  "contract_schema": "../../contracts/canonical-agent-workflow-v2.schema.json",
+  "contract_status": "FROZEN_CANDIDATE",
+  "base_file": "base-valid.json",
+  "vector_count": 37,
+  "accepted_count": 10,
+  "rejected_count": 27,
+  "proposal": {
+    "drive_file_id": "1MHrew-Pe_UFKDGzWsLfcnWazSkLg3ZxR",
+    "raw_sha256": "c304ef7c6c2ebc8ee616ac46f2c3d8f5cec8ad41244d2e3b6f0c666b0130357e",
+    "status": "PROPOSED_NOT_APPLIED"
+  },
+  "vectors": [
+    {
+      "vector_id": "current_identity_chain_pass",
+      "file": "vectors/current_identity_chain_pass.json",
+      "sha256": "29a3756dd1a2b62217529142f8dcff671567dafd7f90c4eea939f479dba740cb",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "stale_guidance_hash_fail_closed",
+      "file": "vectors/stale_guidance_hash_fail_closed.json",
+      "sha256": "70889f1ec62ab3e7f2bb5bdf9129e1293767d76b164b84804dbcd666688c2abd",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "GUIDANCE_HASH_MISMATCH"
+    },
+    {
+      "vector_id": "stale_receipt_pointer_fail_closed",
+      "file": "vectors/stale_receipt_pointer_fail_closed.json",
+      "sha256": "d6c365b85206627ac9a9527c031ff669f0281ee85647e20fc656453492ed25df",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "RECEIPT_POINTER_MISMATCH"
+    },
+    {
+      "vector_id": "model_asserted_drive_ready_rejected",
+      "file": "vectors/model_asserted_drive_ready_rejected.json",
+      "sha256": "083f190700523b01eb913d2d00beb38bf0f59c58c057f6567f050616d8d9f529",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "MODEL_ASSERTED_DRIVE_READY"
+    },
+    {
+      "vector_id": "material_execute_without_plan_approval_denied",
+      "file": "vectors/material_execute_without_plan_approval_denied.json",
+      "sha256": "1ed406dc23ffcfed0f9ac7bc11db4d5a8875d842e47876056a7b3dce025a35a0",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "PLAN_APPROVAL_REQUIRED"
+    },
+    {
+      "vector_id": "scope_change_invalidates_approval",
+      "file": "vectors/scope_change_invalidates_approval.json",
+      "sha256": "1de5d5657e7e1e5ee8347b3c6b956cf2f3e319a8cafbe2599ca7fecae32ca0ba",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "APPROVAL_SCOPE_DRIFT"
+    },
+    {
+      "vector_id": "duplicate_context_hash_deduplicated",
+      "file": "vectors/duplicate_context_hash_deduplicated.json",
+      "sha256": "d962ab2f75176181b8fae1b90c8ce52841c7bf3da2145b1d9d6afa79ea2f6f75",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "equal_authority_context_conflict_blocked",
+      "file": "vectors/equal_authority_context_conflict_blocked.json",
+      "sha256": "a1bede52b6607e9751c285218922f42c59f536471559818713fa6d963d041ba4",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CONTEXT_AUTHORITY_CONFLICT"
+    },
+    {
+      "vector_id": "memory_assertion_not_promoted",
+      "file": "vectors/memory_assertion_not_promoted.json",
+      "sha256": "539d49acadddd5b0138ef8146f0a83852436889a4d867fef154593a3c6737edf",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "missing_tool_dependency_hidden",
+      "file": "vectors/missing_tool_dependency_hidden.json",
+      "sha256": "9a405a0128f626f5c16cfdc6cabea6a0fa86545b373f145854ae4e87c034387d",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "tool_result_over_budget_truncated_with_provenance",
+      "file": "vectors/tool_result_over_budget_truncated_with_provenance.json",
+      "sha256": "79011842070b4cd4ec6e4423c6d405004c4d9386c685e3dcb9bd9eccd12a4186",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "control_stage_retry_forbidden",
+      "file": "vectors/control_stage_retry_forbidden.json",
+      "sha256": "c2d603427e7c5c2aeca338a895e73c7d8f243f268a671995d06051f6c830af66",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CONTROL_STAGE_RETRY_FORBIDDEN"
+    },
+    {
+      "vector_id": "verification_correction_iteration_allowed",
+      "file": "vectors/verification_correction_iteration_allowed.json",
+      "sha256": "2019fcf6a48a790a6f19f1dab4f3eb795d7572b71b54f1b83a24545d3bd62e15",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "fourth_correction_iteration_blocked",
+      "file": "vectors/fourth_correction_iteration_blocked.json",
+      "sha256": "c658abe627a83c81f3e95d97ff43d4bd77ed7586e23a8fbda25e55b85eaea5e2",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CORRECTION_LIMIT_EXCEEDED"
+    },
+    {
+      "vector_id": "confidence_without_evidence_rejected",
+      "file": "vectors/confidence_without_evidence_rejected.json",
+      "sha256": "0f1494f151dbca4897e460be3895f81cd017378fa5bee88f475a40906f840cf2",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CONFIDENCE_NOT_EVIDENCE"
+    },
+    {
+      "vector_id": "duplicate_writer_lease_blocked",
+      "file": "vectors/duplicate_writer_lease_blocked.json",
+      "sha256": "c4f69ab3d7cc7705f600b7a9a45dbdd14b511a3f323ea93d9f9c269b7819bc35",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DUPLICATE_WRITER"
+    },
+    {
+      "vector_id": "stale_generation_handoff_blocked",
+      "file": "vectors/stale_generation_handoff_blocked.json",
+      "sha256": "7a0b6fc6bccae3e0bd628651ee321eb36517f4a7ea55b5f71922235ecaac9f05",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "STALE_HANDOFF_GENERATION"
+    },
+    {
+      "vector_id": "typed_outcomes_not_flattened",
+      "file": "vectors/typed_outcomes_not_flattened.json",
+      "sha256": "ed1b9f77accdc7e2a5edd83b6aeeda472534245bbc6b1c0c5d08282219c1c2aa",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "unvalidated_candidate_not_published",
+      "file": "vectors/unvalidated_candidate_not_published.json",
+      "sha256": "235bc708adb535648f5e117474c90b7d7b3ae51f13c784f8e6a5a2b0ac6205d5",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "compare_and_swap_generation_conflict_blocked",
+      "file": "vectors/compare_and_swap_generation_conflict_blocked.json",
+      "sha256": "8b55109012811aa3f093add90f16c48008bcc3c918c87fad16768c9d3fc4d682",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CAS_GENERATION_CONFLICT"
+    },
+    {
+      "vector_id": "docker_canary_without_required_isolation_evidence_rejected",
+      "file": "vectors/docker_canary_without_required_isolation_evidence_rejected.json",
+      "sha256": "70b8841ad7d2054a44115cb032609af859a248cefb89475571176b50745847d1",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DOCKER_ISOLATION_EVIDENCE_MISSING"
+    },
+    {
+      "vector_id": "opensandbox_runtime_parity_claim_from_docker_rejected",
+      "file": "vectors/opensandbox_runtime_parity_claim_from_docker_rejected.json",
+      "sha256": "8468261297cdf2c37976636a1f87e0e062c8646677a77a0e8dd1ff48032095e3",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "RUNTIME_PARITY_UNPROVEN"
+    },
+    {
+      "vector_id": "cleanup_before_readback_denied",
+      "file": "vectors/cleanup_before_readback_denied.json",
+      "sha256": "7ecf05669a5bfe118ac437f6f1e2dd645946b6aba445ef40ff4aa882872435ac",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "adapter_pass_not_global_pass",
+      "file": "vectors/adapter_pass_not_global_pass.json",
+      "sha256": "cac603750e318ca24c2917aa19ebe9bcab8346a2777fa8261303ed7b1074a143",
+      "expected_decision": "ACCEPT",
+      "expected_reason_code": "CONFORMANT"
+    },
+    {
+      "vector_id": "drive_blocked_rejected",
+      "file": "vectors/drive_blocked_rejected.json",
+      "sha256": "3b511e182688f0a08c48a4a284adde75920aa1dcc823204e9838c4f663aa6115",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DRIVE_CHAIN_NOT_READY"
+    },
+    {
+      "vector_id": "drive_ready_with_reason_codes_rejected",
+      "file": "vectors/drive_ready_with_reason_codes_rejected.json",
+      "sha256": "4dca429fcec7e508d195577cd0f47ec9281e484d3f1c02d06e3e1dc380c11011",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DRIVE_CHAIN_NOT_READY"
+    },
+    {
+      "vector_id": "released_workspace_lease_rejected",
+      "file": "vectors/released_workspace_lease_rejected.json",
+      "sha256": "354897999359bc119ce1ad530673d0f4ffb25a2f59cd52728edc4be6dcc1ea5e",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "WORKSPACE_LEASE_NOT_ACTIVE"
+    },
+    {
+      "vector_id": "missing_writer_lease_rejected",
+      "file": "vectors/missing_writer_lease_rejected.json",
+      "sha256": "7d174af36701bb264d50f019df46e0dd036da779b3289419c49e7bcebbe4f869",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "WRITER_LEASE_NOT_HELD"
+    },
+    {
+      "vector_id": "failed_docker_canary_rejected",
+      "file": "vectors/failed_docker_canary_rejected.json",
+      "sha256": "ec5d4b71f3669e731f013b43bd5942480fdcdd3e61147a2f74eb542f463cb47a",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DOCKER_CANARY_NOT_PASS"
+    },
+    {
+      "vector_id": "unverified_docker_teardown_rejected",
+      "file": "vectors/unverified_docker_teardown_rejected.json",
+      "sha256": "ff4a852c66a3aae536c2f6a312bded988eac3d61944db83fedc70a482c9e8943",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "DOCKER_TEARDOWN_UNVERIFIED"
+    },
+    {
+      "vector_id": "failed_adapter_rejected",
+      "file": "vectors/failed_adapter_rejected.json",
+      "sha256": "1c84369a8588aaa84067bed62b04df14d482af915044f6b803e0f7b9b50cbba0",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "ADAPTER_NOT_PASS"
+    },
+    {
+      "vector_id": "unauthorized_activation_rejected",
+      "file": "vectors/unauthorized_activation_rejected.json",
+      "sha256": "e6a861a935c6b241f7dd577bd83d8c6f8b6f39eee1022b3a4f3a3de46feb785e",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "ACTIVATION_NOT_AUTHORIZED"
+    },
+    {
+      "vector_id": "head_update_without_readback_rejected",
+      "file": "vectors/head_update_without_readback_rejected.json",
+      "sha256": "21f6bd64e1be3c006d006b36139c16c0ad9aeaf1d1d6548311beed384b94f682",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "PUBLICATION_READBACK_UNVERIFIED"
+    },
+    {
+      "vector_id": "head_update_without_receipt_validation_rejected",
+      "file": "vectors/head_update_without_receipt_validation_rejected.json",
+      "sha256": "248e31907522b76f1f2e9788da94523d5d52efdb5ee726a958993e8382865d50",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "PUBLICATION_READBACK_UNVERIFIED"
+    },
+    {
+      "vector_id": "nonsequential_target_generation_rejected",
+      "file": "vectors/nonsequential_target_generation_rejected.json",
+      "sha256": "0e6be37626b134e47a9dd950298bbea9737b12653802fb4358de8401e2167e0e",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "CAS_TARGET_GENERATION_INVALID"
+    },
+    {
+      "vector_id": "top_level_typed_status_mismatch_rejected",
+      "file": "vectors/top_level_typed_status_mismatch_rejected.json",
+      "sha256": "44424ae0579d1a88d5bdb8cb67ee9ac1d18e01a8f01f529fc240a692d65c03de",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "TYPED_OUTCOME_FLATTENED"
+    },
+    {
+      "vector_id": "authority_effect_overlap_rejected",
+      "file": "vectors/authority_effect_overlap_rejected.json",
+      "sha256": "b5e0a43a86183f3d4cf43ba5c5c12c7515b73e31f573e23f80ba5463a05b143c",
+      "expected_decision": "REJECT",
+      "expected_reason_code": "AUTHORITY_EFFECT_CONFLICT"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "top_level_typed_status_mismatch_rejected",
+  "overlay": {
+    "run_result": {
+      "status": "FAIL_CLOSED"
+    }
+  }
+}

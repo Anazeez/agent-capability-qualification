@@ -1,0 +1,63 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "Drive",
+    "provider_version": "google-drive@0.1.16",
+    "source_revision": "f43ceee23ff7c9af1afe03f3bf007f6c1c03a5f0",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "dependency_closure_sha256": "a15f785e4b5d58f347eb071b96cb201daa08f32cca67103109add38823106a8d",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "session_capability",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "codex-plugin:google-drive@0.1.16",
+    "artifact_sha256": "a4bcd604b2e72bd4e20221b369c16bf3a3d627ede0dc3ef8a0634e4c52737723",
+    "artifact_size": 1272,
+    "candidate_tree_sha256": "a4bcd604b2e72bd4e20221b369c16bf3a3d627ede0dc3ef8a0634e4c52737723"
+  },
+  "dependency_closure": {
+    "required": [
+      "canonical-agent-workflow/v2",
+      "google-drive@0.1.16",
+      "native-docs-cas",
+      "python>=3.9"
+    ],
+    "available": [
+      "canonical-agent-workflow/v2",
+      "google-drive@0.1.16",
+      "native-docs-cas",
+      "python>=3.9"
+    ],
+    "lockfiles": [
+      {
+        "path": "google-drive@0.1.16/.codex-plugin/plugin.json",
+        "sha256": "fb76d7ea1eeaf768fd8bd539e6fbd8bd5fb0a911d4bb0b3af3a875c40df9ecb4"
+      },
+      {
+        "path": "google-drive@0.1.16/skills/google-drive/SKILL.md",
+        "sha256": "dabae8a192c861b76cf7b5742bdf14f8ed35e67d8e6cacfd5f746ffbefd6da5c"
+      },
+      {
+        "path": "google-drive@0.1.16/skills/google-docs/SKILL.md",
+        "sha256": "8e5c26053d800e2980b74ab82c2ce95db94a17fbb443f8f6e30baeb442f1d464"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "vector_count": 37,
+    "accepted_count": 10,
+    "rejected_count": 27,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

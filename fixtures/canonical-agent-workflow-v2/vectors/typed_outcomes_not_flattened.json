@@ -1,0 +1,15 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "typed_outcomes_not_flattened",
+  "overlay": {
+    "run_result": {
+      "status": "INCOMPLETE",
+      "source_status": "INCOMPLETE",
+      "rendered_status": "INCOMPLETE",
+      "summary": "Required adapter evidence is incomplete.",
+      "reason_codes": [
+        "ADAPTER_EVIDENCE_INCOMPLETE"
+      ]
+    }
+  }
+}

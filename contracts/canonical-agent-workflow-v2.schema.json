@@ -1,0 +1,1354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonical.invalid/contracts/canonical-agent-workflow-v2.schema.json",
+  "title": "Canonical Agent Workflow v2",
+  "description": "Provider-neutral, fail-closed workflow record for Drive attestation, approval, bounded context, capability closure, evidence correction, workspace leasing, typed results, publication, Docker canaries, and thin adapters.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_sha256",
+    "receipt_sha256",
+    "context_packet_sha256",
+    "phase",
+    "risk_class",
+    "drive_attestation",
+    "plan_approval",
+    "context_projection",
+    "capabilities",
+    "control_plane",
+    "evidence_loop",
+    "workspace_lease",
+    "run_result",
+    "publication",
+    "sandbox_canary",
+    "adapter_manifest",
+    "authority",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "canonical-agent-workflow/v2"
+    },
+    "request_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "receipt_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "context_packet_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "phase": {
+      "enum": [
+        "DISCOVER",
+        "PLAN",
+        "AWAIT_APPROVAL",
+        "EXECUTE",
+        "VERIFY",
+        "INTEGRATE",
+        "HANDOFF",
+        "CLOSED",
+        "BLOCKED"
+      ]
+    },
+    "risk_class": {
+      "enum": [
+        "read_only",
+        "bounded_ephemeral",
+        "material_mutation",
+        "consequential_external"
+      ]
+    },
+    "drive_attestation": {
+      "$ref": "#/$defs/drive_attestation"
+    },
+    "plan_approval": {
+      "$ref": "#/$defs/plan_approval"
+    },
+    "context_projection": {
+      "$ref": "#/$defs/context_projection"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capability"
+      },
+      "minItems": 1
+    },
+    "control_plane": {
+      "$ref": "#/$defs/control_plane_budget"
+    },
+    "evidence_loop": {
+      "$ref": "#/$defs/evidence_loop"
+    },
+    "workspace_lease": {
+      "$ref": "#/$defs/workspace_lease"
+    },
+    "run_result": {
+      "$ref": "#/$defs/run_result"
+    },
+    "publication": {
+      "$ref": "#/$defs/publication_transaction"
+    },
+    "sandbox_canary": {
+      "$ref": "#/$defs/sandbox_canary"
+    },
+    "adapter_manifest": {
+      "$ref": "#/$defs/adapter_manifest"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_owner",
+        "integration_owner",
+        "conclusion_owner",
+        "activation_authority",
+        "allowed_effects",
+        "denied_effects"
+      ],
+      "properties": {
+        "decision_owner": {
+          "const": "Sol"
+        },
+        "integration_owner": {
+          "enum": [
+            "Sol",
+            "Sol/Codex"
+          ]
+        },
+        "conclusion_owner": {
+          "const": "Sol"
+        },
+        "activation_authority": {
+          "const": "none"
+        },
+        "allowed_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "denied_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "drive_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "drive_root_id",
+        "guidance_file_id",
+        "guidance_sha256",
+        "manifest_file_id",
+        "manifest_sha256",
+        "manifest_guidance_sha256",
+        "manifest_receipt_file_id",
+        "manifest_receipt_sha256",
+        "newest_receipt_file_id",
+        "newest_receipt_sha256",
+        "receipt_guidance_sha256",
+        "receipt_in_scope",
+        "metadata_readback_verified",
+        "content_readback_verified",
+        "verified_at",
+        "validator_version",
+        "validator_sha256",
+        "status",
+        "reason_codes",
+        "asserted_by"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-drive-attestation/v1"
+        },
+        "drive_root_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guidance_file_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guidance_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifest_file_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifest_guidance_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifest_receipt_file_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "newest_receipt_file_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "newest_receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_guidance_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_in_scope": {
+          "type": "boolean"
+        },
+        "metadata_readback_verified": {
+          "type": "boolean"
+        },
+        "content_readback_verified": {
+          "type": "boolean"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validator_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "enum": [
+            "READY",
+            "STALE",
+            "BLOCKED",
+            "UNKNOWN"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "uniqueItems": true
+        },
+        "asserted_by": {
+          "enum": [
+            "validator",
+            "model",
+            "provider"
+          ]
+        }
+      }
+    },
+    "plan_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "approved_request_sha256",
+        "current_request_sha256",
+        "approved_receipt_sha256",
+        "current_receipt_sha256",
+        "approved_context_packet_sha256",
+        "current_context_packet_sha256",
+        "approved_plan_sha256",
+        "current_plan_sha256",
+        "approved_scope_digest",
+        "current_scope_digest",
+        "approved_acceptance_digest",
+        "current_acceptance_digest",
+        "approved_effects_digest",
+        "current_effects_digest",
+        "approved_dependency_digest",
+        "current_dependency_digest",
+        "approved_base_revision_sha256",
+        "current_base_revision_sha256",
+        "generation",
+        "approved_by",
+        "approved_at",
+        "expires_at",
+        "allowed_effects",
+        "denied_effects"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-plan-approval/v1"
+        },
+        "status": {
+          "enum": [
+            "PENDING",
+            "APPROVED",
+            "REJECTED",
+            "EXPIRED",
+            "REVOKED"
+          ]
+        },
+        "approved_request_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_request_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_context_packet_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_context_packet_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_plan_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_plan_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_scope_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_scope_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_acceptance_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_acceptance_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_effects_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_effects_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_dependency_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_dependency_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "approved_base_revision_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "current_base_revision_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "approved_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "allowed_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "denied_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "context_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content_id",
+        "sha256",
+        "scope",
+        "authority_class",
+        "load_reason",
+        "freshness_status",
+        "estimated_tokens",
+        "source_kind"
+      ],
+      "properties": {
+        "content_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_class": {
+          "enum": [
+            "managed_policy",
+            "user_preference",
+            "project_policy",
+            "path_policy",
+            "task_packet",
+            "memory_advisory",
+            "tool_contract"
+          ]
+        },
+        "load_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "freshness_status": {
+          "enum": [
+            "CURRENT",
+            "STALE",
+            "UNKNOWN"
+          ]
+        },
+        "estimated_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_kind": {
+          "enum": [
+            "policy",
+            "preference",
+            "project",
+            "path",
+            "task",
+            "memory",
+            "tool"
+          ]
+        }
+      }
+    },
+    "context_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "source_items",
+        "loaded_items",
+        "equal_authority_conflict",
+        "conflict_blocked",
+        "memory"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-context-projection/v1"
+        },
+        "source_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/context_item"
+          }
+        },
+        "loaded_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/context_item"
+          }
+        },
+        "equal_authority_conflict": {
+          "type": "boolean"
+        },
+        "conflict_blocked": {
+          "type": "boolean"
+        },
+        "memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "asserted_by",
+            "promotion_authorized_by_user",
+            "durably_promoted"
+          ],
+          "properties": {
+            "asserted_by": {
+              "enum": [
+                "none",
+                "model",
+                "user",
+                "tool"
+              ]
+            },
+            "promotion_authorized_by_user": {
+              "type": "boolean"
+            },
+            "durably_promoted": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "capability_id",
+        "provider_id",
+        "provider_version",
+        "tool_schema_sha256",
+        "argument_bounds",
+        "side_effect_class",
+        "permission_decision",
+        "required_dependencies",
+        "available_dependencies",
+        "dependency_evidence_sha256",
+        "qualified",
+        "executable_now",
+        "in_scope",
+        "visible",
+        "failure_semantics",
+        "result_budget"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-capability-manifest/v2"
+        },
+        "capability_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool_schema_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "argument_bounds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_bytes"
+          ],
+          "properties": {
+            "max_bytes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "side_effect_class": {
+          "enum": [
+            "read_only",
+            "bounded_ephemeral",
+            "material_mutation",
+            "consequential_external"
+          ]
+        },
+        "permission_decision": {
+          "enum": [
+            "ALLOW",
+            "DENY",
+            "REQUIRE_APPROVAL"
+          ]
+        },
+        "required_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "available_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "dependency_evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "qualified": {
+          "type": "boolean"
+        },
+        "executable_now": {
+          "type": "boolean"
+        },
+        "in_scope": {
+          "type": "boolean"
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "failure_semantics": {
+          "enum": [
+            "FAIL_CLOSED",
+            "SKIP_ONCE",
+            "DENY"
+          ]
+        },
+        "result_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_bytes",
+            "observed_bytes",
+            "truncated",
+            "provenance_preserved"
+          ],
+          "properties": {
+            "max_bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "observed_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "provenance_preserved": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "control_plane_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "max_attempts_per_stage",
+        "retry",
+        "backoff_ms",
+        "deadline",
+        "stages"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-control-plane-budget/v1"
+        },
+        "max_attempts_per_stage": {
+          "const": 1
+        },
+        "retry": {
+          "type": "boolean"
+        },
+        "backoff_ms": {
+          "const": 0
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stage",
+              "attempts"
+            ],
+            "properties": {
+              "stage": {
+                "enum": [
+                  "drive",
+                  "judge",
+                  "jcode",
+                  "specialist"
+                ]
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidence_iteration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iteration",
+        "candidate_digest",
+        "plan_sha256",
+        "actions",
+        "observations",
+        "acceptance_results",
+        "remaining_deltas",
+        "decision"
+      ],
+      "properties": {
+        "iteration": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "candidate_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "plan_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "acceptance_results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "criterion",
+              "status"
+            ],
+            "properties": {
+              "criterion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        "remaining_deltas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "decision": {
+          "enum": [
+            "ACCEPT",
+            "CORRECT",
+            "BLOCK"
+          ]
+        }
+      }
+    },
+    "evidence_loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "max_correction_iterations",
+        "confidence_only",
+        "iterations"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-evidence-loop/v1"
+        },
+        "max_correction_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "confidence_only": {
+          "type": "boolean"
+        },
+        "iterations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_iteration"
+          },
+          "maxItems": 100
+        }
+      }
+    },
+    "workspace_lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "repository_id",
+        "base_revision",
+        "workspace_id",
+        "branch_or_worktree",
+        "owner_task_id",
+        "generation",
+        "handoff_generation",
+        "scope_digest",
+        "issued_at",
+        "expires_at",
+        "status",
+        "live_descendant_count",
+        "unresolved_waiter_count",
+        "live_writer_count"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-workspace-lease/v1"
+        },
+        "repository_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "workspace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch_or_worktree": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "handoff_generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scope_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "enum": [
+            "ACTIVE",
+            "RELEASED",
+            "ABORTED",
+            "EXPIRED",
+            "BLOCKED"
+          ]
+        },
+        "live_descendant_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_waiter_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "live_writer_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "run_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "source_status",
+        "rendered_status",
+        "summary",
+        "reason_codes",
+        "request_sha256",
+        "receipt_sha256",
+        "context_packet_sha256",
+        "phase",
+        "attempts",
+        "correction_iterations",
+        "authority",
+        "next_actions",
+        "artifacts",
+        "evidence",
+        "provenance"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-run-result/v2"
+        },
+        "status": {
+          "enum": [
+            "READY",
+            "INLINE",
+            "PASS",
+            "FAIL_CLOSED",
+            "INCOMPLETE",
+            "BLOCKED",
+            "DENIED",
+            "TIMEOUT",
+            "ABORTED",
+            "CANCELLED",
+            "ERROR",
+            "UNKNOWN"
+          ]
+        },
+        "source_status": {
+          "enum": [
+            "READY",
+            "INLINE",
+            "PASS",
+            "FAIL_CLOSED",
+            "INCOMPLETE",
+            "BLOCKED",
+            "DENIED",
+            "TIMEOUT",
+            "ABORTED",
+            "CANCELLED",
+            "ERROR",
+            "UNKNOWN"
+          ]
+        },
+        "rendered_status": {
+          "enum": [
+            "READY",
+            "INLINE",
+            "PASS",
+            "FAIL_CLOSED",
+            "INCOMPLETE",
+            "BLOCKED",
+            "DENIED",
+            "TIMEOUT",
+            "ABORTED",
+            "CANCELLED",
+            "ERROR",
+            "UNKNOWN"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "uniqueItems": true
+        },
+        "request_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "receipt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "context_packet_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "phase": {
+          "enum": [
+            "DISCOVER",
+            "PLAN",
+            "AWAIT_APPROVAL",
+            "EXECUTE",
+            "VERIFY",
+            "INTEGRATE",
+            "HANDOFF",
+            "CLOSED",
+            "BLOCKED"
+          ]
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "correction_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifact_id",
+              "sha256"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifact_id",
+              "sha256"
+            ],
+            "properties": {
+              "artifact_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "sha256"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      }
+    },
+    "publication_transaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "candidate_validated",
+        "publication_attempted",
+        "readback_verified",
+        "receipt_validated",
+        "expected_generation",
+        "current_generation",
+        "target_generation",
+        "head_updated",
+        "cleanup_started",
+        "activation_started"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-drive-publication/v2"
+        },
+        "candidate_validated": {
+          "type": "boolean"
+        },
+        "publication_attempted": {
+          "type": "boolean"
+        },
+        "readback_verified": {
+          "type": "boolean"
+        },
+        "receipt_validated": {
+          "type": "boolean"
+        },
+        "expected_generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "current_generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_generation": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "head_updated": {
+          "type": "boolean"
+        },
+        "cleanup_started": {
+          "type": "boolean"
+        },
+        "activation_started": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sandbox_canary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "backend",
+        "image_digest",
+        "status",
+        "isolation_evidence",
+        "opensandbox_runtime_parity_claimed",
+        "teardown_verified"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-disposable-canary/v1"
+        },
+        "backend": {
+          "enum": [
+            "Docker",
+            "OpenSandbox"
+          ]
+        },
+        "image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "isolation_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "network_none",
+            "default_deny_egress",
+            "finite_ttl",
+            "resource_caps",
+            "pinned_identities",
+            "no_host_mounts",
+            "no_docker_socket",
+            "no_production_credentials",
+            "negative_authority_probe",
+            "tamper_probe",
+            "timeout_probe",
+            "lifecycle_probe",
+            "host_isolation_probe",
+            "rollback_identity",
+            "verified_teardown"
+          ],
+          "properties": {
+            "network_none": {
+              "type": "boolean"
+            },
+            "default_deny_egress": {
+              "type": "boolean"
+            },
+            "finite_ttl": {
+              "type": "boolean"
+            },
+            "resource_caps": {
+              "type": "boolean"
+            },
+            "pinned_identities": {
+              "type": "boolean"
+            },
+            "no_host_mounts": {
+              "type": "boolean"
+            },
+            "no_docker_socket": {
+              "type": "boolean"
+            },
+            "no_production_credentials": {
+              "type": "boolean"
+            },
+            "negative_authority_probe": {
+              "type": "boolean"
+            },
+            "tamper_probe": {
+              "type": "boolean"
+            },
+            "timeout_probe": {
+              "type": "boolean"
+            },
+            "lifecycle_probe": {
+              "type": "boolean"
+            },
+            "host_isolation_probe": {
+              "type": "boolean"
+            },
+            "rollback_identity": {
+              "type": "boolean"
+            },
+            "verified_teardown": {
+              "type": "boolean"
+            }
+          }
+        },
+        "opensandbox_runtime_parity_claimed": {
+          "type": "boolean"
+        },
+        "teardown_verified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "adapter_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "adapter_id",
+        "provider_version",
+        "source_revision",
+        "contract_sha256",
+        "vector_tree_sha256",
+        "dependency_closure_sha256",
+        "status",
+        "global_completion_claim",
+        "all_required_adapters_passed"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "canonical-workflow-adapter-manifest/v1"
+        },
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "contract_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "vector_tree_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "dependency_closure_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCOMPLETE",
+            "BLOCKED"
+          ]
+        },
+        "global_completion_claim": {
+          "type": "boolean"
+        },
+        "all_required_adapters_passed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "source_revision",
+        "contract_owner",
+        "contract_status",
+        "proposal_file_id",
+        "proposal_raw_sha256"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "contract_owner": {
+          "const": "agent-capability-qualification"
+        },
+        "contract_status": {
+          "enum": [
+            "FROZEN_CANDIDATE",
+            "QUALIFIED",
+            "REJECTED"
+          ]
+        },
+        "proposal_file_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal_raw_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

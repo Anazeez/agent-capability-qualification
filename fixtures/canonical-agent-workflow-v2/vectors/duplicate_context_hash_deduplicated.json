@@ -1,0 +1,42 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "duplicate_context_hash_deduplicated",
+  "overlay": {
+    "context_projection": {
+      "source_items": [
+        {
+          "content_id": "managed-policy-1",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "scope": "global",
+          "authority_class": "managed_policy",
+          "load_reason": "always_required",
+          "freshness_status": "CURRENT",
+          "estimated_tokens": 256,
+          "source_kind": "policy"
+        },
+        {
+          "content_id": "managed-policy-1",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "scope": "global",
+          "authority_class": "managed_policy",
+          "load_reason": "always_required",
+          "freshness_status": "CURRENT",
+          "estimated_tokens": 256,
+          "source_kind": "policy"
+        }
+      ],
+      "loaded_items": [
+        {
+          "content_id": "managed-policy-1",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "scope": "global",
+          "authority_class": "managed_policy",
+          "load_reason": "always_required",
+          "freshness_status": "CURRENT",
+          "estimated_tokens": 256,
+          "source_kind": "policy"
+        }
+      ]
+    }
+  }
+}

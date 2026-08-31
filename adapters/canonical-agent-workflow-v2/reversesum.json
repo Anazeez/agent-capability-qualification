@@ -1,0 +1,73 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "ReverseSum",
+    "provider_version": "reversesum-worker@0.1.0",
+    "source_revision": "b994f01ebe7a7ef0d3e0e69284fab1bf25ea38b7",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "dependency_closure_sha256": "d4a0929243975dc5614f700c39916e473d380364c0abfcc0321d7c5e920b97c9",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "drive_archive",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "drive-file:1X2oh9KfngYSzHKEBdxGjsVdXxDlVj9vd",
+    "artifact_sha256": "d524b3f63c8c59e642468f19c8f3deb893e558630ca90d088f8711c8b96e19ad",
+    "artifact_size": 1305613,
+    "candidate_tree_sha256": "b8bef2748c1bc2023e04b0bad1b9d1d8ebe3be52584b877f5231c0a7622741d2"
+  },
+  "dependency_closure": {
+    "required": [
+      "@cloudflare/containers@0.3.7",
+      "@modelcontextprotocol/server@2.0.0",
+      "agents@0.20.1",
+      "canonical-agent-workflow/v2",
+      "node",
+      "tsx@4.23.12",
+      "typescript@7.0.2",
+      "wrangler@4.120.1",
+      "zod@4.4.3"
+    ],
+    "available": [
+      "@cloudflare/containers@0.3.7",
+      "@modelcontextprotocol/server@2.0.0",
+      "agents@0.20.1",
+      "canonical-agent-workflow/v2",
+      "node",
+      "tsx@4.23.12",
+      "typescript@7.0.2",
+      "wrangler@4.120.1",
+      "zod@4.4.3"
+    ],
+    "lockfiles": [
+      {
+        "path": "package-lock.json",
+        "sha256": "3e7ee3e77396788089ea6f50b65a945fd3c511b1edf3bacf6913273df0723f72"
+      },
+      {
+        "path": "src/nonprod-authority-lock.ts",
+        "sha256": "8b7a3f66d408b593e1e83a6b7d91c093b17136a9c9cc1ca250c16a4be983480f"
+      },
+      {
+        "path": "src/execution/reconstruction-authority.ts",
+        "sha256": "84b2e607be4038ec1baae1ccc04a3d009367c7fb2221cd990df3369bb9078977"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614",
+    "vector_tree_sha256": "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed",
+    "vector_count": 37,
+    "accepted_count": 10,
+    "rejected_count": 27,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "head_update_without_receipt_validation_rejected",
+  "overlay": {
+    "publication": {
+      "receipt_validated": false
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "equal_authority_context_conflict_blocked",
+  "overlay": {
+    "context_projection": {
+      "equal_authority_conflict": true,
+      "conflict_blocked": false
+    }
+  }
+}

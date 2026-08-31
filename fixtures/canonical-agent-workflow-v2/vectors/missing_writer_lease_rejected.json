@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "missing_writer_lease_rejected",
+  "overlay": {
+    "workspace_lease": {
+      "live_writer_count": 0
+    }
+  }
+}

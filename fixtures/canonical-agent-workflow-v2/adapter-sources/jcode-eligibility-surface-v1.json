@@ -1,0 +1,22 @@
+{
+  "schema_version": "canonical-adapter-source-descriptor/v1",
+  "adapter_id": "Jcode",
+  "provider_version": "jcode-companion@82be955+candidate.1d1c3806",
+  "qualification_boundary": "eligibility evaluation without dispatch authority",
+  "runtime_owner": {
+    "repository": "https://github.com/Anazeez/jcode-companion.git",
+    "base_revision": "82be955808efde32da270ae184e064a00aa08933",
+    "candidate_tree_sha256": "1d1c3806ff9fdd696bbfde084ad91ba7b0f71262410145e7b7056b8ab1c7a1e3",
+    "candidate_bundle_sha256": "79da16439e3cf84ca6f675a26764056351300d23a7fabe5086341d7391c432f0"
+  },
+  "eligibility_is_dispatch_authority": false,
+  "dispatch_requires": [
+    "separate Sol grant",
+    "current request binding",
+    "positive generation",
+    "unexpired grant",
+    "ACTIVE status"
+  ],
+  "live_dispatch_performed": false,
+  "activation_authority": "none"
+}
