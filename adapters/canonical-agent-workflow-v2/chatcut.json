@@ -1,0 +1,63 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "ChatCut",
+    "provider_version": "chatcut-v241-phase1@source-2026-08-24",
+    "source_revision": "ae0c13cdca86b522172d02a739e04f7de5ba26f1",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa",
+    "dependency_closure_sha256": "6439ac7418dfaed34886bdffed03b04506cbbab50aae82018acb6427c2c26ecf",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "drive_archive",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "drive-file:1Ab1so8uRbTNZmNrv3um32SyaE7RNypLh",
+    "artifact_sha256": "88eafb48690276e8cd8273c0eff6e7c4a046d84e85e958b2a2ac5f56d9e163a0",
+    "artifact_size": 40055,
+    "candidate_tree_sha256": "0789933f9eeb797f67b71a833b07230236fc9303f43b948a624a1c77038f7916"
+  },
+  "dependency_closure": {
+    "required": [
+      "canonical-agent-workflow/v2",
+      "esbuild@^0.28.2",
+      "node",
+      "typescript@^5.9.2"
+    ],
+    "available": [
+      "canonical-agent-workflow/v2",
+      "esbuild@^0.28.2",
+      "node",
+      "typescript@^5.9.2"
+    ],
+    "lockfiles": [
+      {
+        "path": "package-lock.json",
+        "sha256": "0f1bdb74072502ff79d785a6a6855a5e40692a44d8a298607ec3784881f61c5e"
+      },
+      {
+        "path": "src/canonical-upgrade.ts",
+        "sha256": "87fa0c04058021405bacc7a80a42fa41a939a007a09af5fa6fab77ba06c55c1e"
+      },
+      {
+        "path": "contracts/canonical-upgrade-contract-v1.json",
+        "sha256": "b87dacfde8a40a0ce7a39e0e14c1c3ea0b90da49b170854310a47336829543dc"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "66af03e86d67e016d8000902dafd396eb898a6678591fb0291ddc6af846330d3",
+    "vector_tree_sha256": "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa",
+    "vector_count": 24,
+    "accepted_count": 10,
+    "rejected_count": 14,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

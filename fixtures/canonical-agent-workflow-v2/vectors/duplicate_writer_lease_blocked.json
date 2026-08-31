@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "duplicate_writer_lease_blocked",
+  "overlay": {
+    "workspace_lease": {
+      "live_writer_count": 2
+    }
+  }
+}

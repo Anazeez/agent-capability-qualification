@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "stale_receipt_pointer_fail_closed",
+  "overlay": {
+    "drive_attestation": {
+      "newest_receipt_file_id": "unlinked-receipt"
+    }
+  }
+}

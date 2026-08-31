@@ -1,0 +1,27 @@
+{
+  "schema_version": "canonical-adapter-source-descriptor/v1",
+  "adapter_id": "Drive",
+  "provider_version": "google-drive@0.1.16",
+  "source_implementation_visibility": "opaque_remote",
+  "qualification_boundary": "installed plugin contract plus live native-Docs CAS behavior",
+  "installed_plugin": {
+    "app_json_sha256": "4be9a4ff5a3c208ba73393284a3e11957f2d6a196f2caf47e206bd86f5fef8c4",
+    "plugin_json_sha256": "fb76d7ea1eeaf768fd8bd539e6fbd8bd5fb0a911d4bb0b3af3a875c40df9ecb4",
+    "drive_skill_sha256": "dabae8a192c861b76cf7b5742bdf14f8ed35e67d8e6cacfd5f746ffbefd6da5c",
+    "docs_skill_sha256": "8e5c26053d800e2980b74ab82c2ce95db94a17fbb443f8f6e30baeb442f1d464"
+  },
+  "required_tool_contracts": [
+    "google_drive_batch_update_document.requiredRevisionId",
+    "google_drive_fetch.raw-byte-stream",
+    "google_drive_list_folder",
+    "google_drive_search",
+    "google_drive_upload_file"
+  ],
+  "live_evidence": {
+    "production_head_doc_id": "1MWNOPkgTrzn8UR37vq_8_rH3sqX6hJMJY4Oc8MASE54",
+    "bootstrap_pointer_v2_id": "1ru-zNqJiOtQiSiaQMDVX_D5gGI97bdc9",
+    "cas_shadow_canary_doc_id": "1tgQcMT1i2HWjjty-0ZmCGUnBa4YElWilbm_4Ay0l3Cs",
+    "production_migration_receipt_id": "1Qszz7_5BeUmDaFvm-050XtBNUup05XCl"
+  },
+  "activation_authority": "none"
+}

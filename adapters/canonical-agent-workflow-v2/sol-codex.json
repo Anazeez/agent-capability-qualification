@@ -1,0 +1,61 @@
+{
+  "schema_version": "canonical-workflow-adapter-qualification/v1",
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "Sol/Codex",
+    "provider_version": "gpt-5.6-sol/session-catalog-2026-08-31",
+    "source_revision": "8846e22e2434fecb8e48b395081fbb21a83f1aeb",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_tree_sha256": "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa",
+    "dependency_closure_sha256": "c31cb5e976a23ddfc999a31979d415e74d2a47bc8b5009f405797a8c9513cf0e",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "source_identity": {
+    "kind": "session_capability",
+    "revision_derivation": "sha1_raw_bytes",
+    "source_locator": "codex-model:gpt-5.6-sol+jcode-companion-candidate:1d1c3806",
+    "artifact_sha256": "4282f9ea66edb06f0281eebd47a251efd857f9846e98cb56c1ce6995c4571f26",
+    "artifact_size": 874,
+    "candidate_tree_sha256": "4282f9ea66edb06f0281eebd47a251efd857f9846e98cb56c1ce6995c4571f26"
+  },
+  "dependency_closure": {
+    "required": [
+      "canonical-agent-workflow/v2",
+      "gpt-5.6-sol",
+      "jcode-companion-candidate@1d1c3806",
+      "python>=3.9",
+      "sol-authority-projection"
+    ],
+    "available": [
+      "canonical-agent-workflow/v2",
+      "gpt-5.6-sol",
+      "jcode-companion-candidate@1d1c3806",
+      "python>=3.9",
+      "sol-authority-projection"
+    ],
+    "lockfiles": [
+      {
+        "path": "jcode-companion-runtime-governance-v2-candidate-r1.zip",
+        "sha256": "79da16439e3cf84ca6f675a26764056351300d23a7fabe5086341d7391c432f0"
+      },
+      {
+        "path": "canonical-runtime-governance-v2-dependency-closure-v1.json",
+        "sha256": "60d2ed0eb0d7ef09830dc7e0324e5b7567f8ec440dbc8eb377092d4410cbcf76"
+      }
+    ]
+  },
+  "qualification": {
+    "classification": "PASS_TEST_SHADOW_ONLY",
+    "contract_sha256": "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf",
+    "vector_manifest_sha256": "66af03e86d67e016d8000902dafd396eb898a6678591fb0291ddc6af846330d3",
+    "vector_tree_sha256": "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa",
+    "vector_count": 24,
+    "accepted_count": 10,
+    "rejected_count": 14,
+    "shared_vectors_passed": true,
+    "live_execution_performed": false,
+    "activation_authority": "none"
+  }
+}

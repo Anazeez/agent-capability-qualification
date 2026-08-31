@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "compare_and_swap_generation_conflict_blocked",
+  "overlay": {
+    "publication": {
+      "expected_generation": 4,
+      "current_generation": 5,
+      "target_generation": 5,
+      "head_updated": true
+    }
+  }
+}

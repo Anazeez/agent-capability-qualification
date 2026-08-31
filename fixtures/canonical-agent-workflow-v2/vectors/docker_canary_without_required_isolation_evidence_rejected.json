@@ -1,0 +1,26 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "docker_canary_without_required_isolation_evidence_rejected",
+  "overlay": {
+    "sandbox_canary": {
+      "status": "FAIL",
+      "isolation_evidence": {
+        "network_none": true,
+        "default_deny_egress": true,
+        "finite_ttl": true,
+        "resource_caps": true,
+        "pinned_identities": true,
+        "no_host_mounts": false,
+        "no_docker_socket": true,
+        "no_production_credentials": true,
+        "negative_authority_probe": true,
+        "tamper_probe": true,
+        "timeout_probe": true,
+        "lifecycle_probe": true,
+        "host_isolation_probe": true,
+        "rollback_identity": true,
+        "verified_teardown": true
+      }
+    }
+  }
+}

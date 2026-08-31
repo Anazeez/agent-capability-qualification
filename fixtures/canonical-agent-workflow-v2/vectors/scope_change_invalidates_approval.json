@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "scope_change_invalidates_approval",
+  "overlay": {
+    "plan_approval": {
+      "current_scope_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+  }
+}

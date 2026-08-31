@@ -1,0 +1,22 @@
+{
+  "schema_version": "canonical-adapter-source-descriptor/v1",
+  "adapter_id": "Luna",
+  "provider_version": "gpt-5.6-luna/session-catalog-2026-08-31",
+  "source_implementation_visibility": "opaque_hosted_model",
+  "qualification_boundary": "bounded advisory worker projection only",
+  "runtime_owner": {
+    "repository": "https://github.com/Anazeez/jcode-companion.git",
+    "base_revision": "82be955808efde32da270ae184e064a00aa08933",
+    "candidate_tree_sha256": "1d1c3806ff9fdd696bbfde084ad91ba7b0f71262410145e7b7056b8ab1c7a1e3",
+    "candidate_bundle_sha256": "79da16439e3cf84ca6f675a26764056351300d23a7fabe5086341d7391c432f0"
+  },
+  "authority": {
+    "schedules": false,
+    "integrates": false,
+    "approves": false,
+    "concludes": false,
+    "drive_writer_during_freeze": false
+  },
+  "live_model_execution_performed": false,
+  "activation_authority": "none"
+}

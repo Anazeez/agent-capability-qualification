@@ -1,0 +1,13 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "unvalidated_candidate_not_published",
+  "overlay": {
+    "publication": {
+      "candidate_validated": false,
+      "publication_attempted": false,
+      "readback_verified": false,
+      "receipt_validated": false,
+      "head_updated": false
+    }
+  }
+}

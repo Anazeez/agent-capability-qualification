@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "material_execute_without_plan_approval_denied",
+  "overlay": {
+    "plan_approval": {
+      "status": "PENDING"
+    }
+  }
+}

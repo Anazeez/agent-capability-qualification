@@ -1,0 +1,39 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "missing_tool_dependency_hidden",
+  "overlay": {
+    "capabilities": [
+      {
+        "schema_version": "canonical-capability-manifest/v2",
+        "capability_id": "drive.read",
+        "provider_id": "google-drive",
+        "provider_version": "v3",
+        "tool_schema_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "argument_bounds": {
+          "max_bytes": 4096
+        },
+        "side_effect_class": "read_only",
+        "permission_decision": "ALLOW",
+        "required_dependencies": [
+          "python",
+          "missing-cli"
+        ],
+        "available_dependencies": [
+          "python"
+        ],
+        "dependency_evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "qualified": true,
+        "executable_now": false,
+        "in_scope": true,
+        "visible": false,
+        "failure_semantics": "FAIL_CLOSED",
+        "result_budget": {
+          "max_bytes": 1024,
+          "observed_bytes": 512,
+          "truncated": false,
+          "provenance_preserved": true
+        }
+      }
+    ]
+  }
+}

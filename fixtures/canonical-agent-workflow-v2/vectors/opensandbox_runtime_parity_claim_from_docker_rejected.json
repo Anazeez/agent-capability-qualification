@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "opensandbox_runtime_parity_claim_from_docker_rejected",
+  "overlay": {
+    "sandbox_canary": {
+      "opensandbox_runtime_parity_claimed": true
+    }
+  }
+}

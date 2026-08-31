@@ -1,0 +1,13 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "memory_assertion_not_promoted",
+  "overlay": {
+    "context_projection": {
+      "memory": {
+        "asserted_by": "model",
+        "promotion_authorized_by_user": false,
+        "durably_promoted": false
+      }
+    }
+  }
+}

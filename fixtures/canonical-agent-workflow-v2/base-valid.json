@@ -1,0 +1,315 @@
+{
+  "schema_version": "canonical-agent-workflow/v2",
+  "request_sha256": "b7f4fbe58c52fdfe3c4274f3389bbded49282232ed588b52cf6f5b70ee7e94ea",
+  "receipt_sha256": "82ab9429425eb895f277122fa564ad755f1f99f9b00b6f3c579d20cade0ab3e6",
+  "context_packet_sha256": "6716fdb4341540e8de1e82d6f77f2a3f42ffc7d6fdaf5cd4f5688aab6fc314fc",
+  "phase": "VERIFY",
+  "risk_class": "material_mutation",
+  "drive_attestation": {
+    "schema_version": "canonical-drive-attestation/v1",
+    "drive_root_id": "1OEYShWutBYy915CEPIEnVPrMCf9VvBvM",
+    "guidance_file_id": "1uQcaNcx4CzKme9c7oJ6tqg9vxfCze6W2",
+    "guidance_sha256": "38fe437e38f9c7f0ef09e79dd3a207bfa13a27cc9991ca49a2663ad7ec66f8e5",
+    "manifest_file_id": "17Egu2i6KFA3gI3MpnTHUmfihXEfQRtrt",
+    "manifest_sha256": "9e5db74bfc39ca910b91d47765fdd240816841f2f94dfcc202f60826d3f51cbd",
+    "manifest_guidance_sha256": "38fe437e38f9c7f0ef09e79dd3a207bfa13a27cc9991ca49a2663ad7ec66f8e5",
+    "manifest_receipt_file_id": "16fjzWoySzRtu2gXYNArkzL56UpvudL7X",
+    "manifest_receipt_sha256": "fe8d0dab7ebdd0d34782331c42e4de81b4264af16402811ad452d3335c37b113",
+    "newest_receipt_file_id": "16fjzWoySzRtu2gXYNArkzL56UpvudL7X",
+    "newest_receipt_sha256": "fe8d0dab7ebdd0d34782331c42e4de81b4264af16402811ad452d3335c37b113",
+    "receipt_guidance_sha256": "38fe437e38f9c7f0ef09e79dd3a207bfa13a27cc9991ca49a2663ad7ec66f8e5",
+    "receipt_in_scope": true,
+    "metadata_readback_verified": true,
+    "content_readback_verified": true,
+    "verified_at": "2026-08-30T22:30:00Z",
+    "validator_version": "canonical-drive-semantic-gate0/v4",
+    "validator_sha256": "a211828b0544530537518444c8290047b46e73becd44737ea08f5a85532a7c23",
+    "status": "READY",
+    "reason_codes": [],
+    "asserted_by": "validator"
+  },
+  "plan_approval": {
+    "schema_version": "canonical-plan-approval/v1",
+    "status": "APPROVED",
+    "approved_request_sha256": "b7f4fbe58c52fdfe3c4274f3389bbded49282232ed588b52cf6f5b70ee7e94ea",
+    "current_request_sha256": "b7f4fbe58c52fdfe3c4274f3389bbded49282232ed588b52cf6f5b70ee7e94ea",
+    "approved_receipt_sha256": "82ab9429425eb895f277122fa564ad755f1f99f9b00b6f3c579d20cade0ab3e6",
+    "current_receipt_sha256": "82ab9429425eb895f277122fa564ad755f1f99f9b00b6f3c579d20cade0ab3e6",
+    "approved_context_packet_sha256": "6716fdb4341540e8de1e82d6f77f2a3f42ffc7d6fdaf5cd4f5688aab6fc314fc",
+    "current_context_packet_sha256": "6716fdb4341540e8de1e82d6f77f2a3f42ffc7d6fdaf5cd4f5688aab6fc314fc",
+    "approved_plan_sha256": "c7ca0b7617d4d93189dbdba9c7763c3f69687f1ce895652707b94420cb8eb2d9",
+    "current_plan_sha256": "c7ca0b7617d4d93189dbdba9c7763c3f69687f1ce895652707b94420cb8eb2d9",
+    "approved_scope_digest": "2a14bc9d10a5556db81c6e514d195c12d39ac23fdc12e29a73588e75d97f8f1c",
+    "current_scope_digest": "2a14bc9d10a5556db81c6e514d195c12d39ac23fdc12e29a73588e75d97f8f1c",
+    "approved_acceptance_digest": "998296779d4948bc5b0aec2ee212fcb33ee411a4bb66021a7e13c35e2d2865c0",
+    "current_acceptance_digest": "998296779d4948bc5b0aec2ee212fcb33ee411a4bb66021a7e13c35e2d2865c0",
+    "approved_effects_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "current_effects_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "approved_dependency_digest": "5555555555555555555555555555555555555555555555555555555555555555",
+    "current_dependency_digest": "5555555555555555555555555555555555555555555555555555555555555555",
+    "approved_base_revision_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "current_base_revision_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "generation": 1,
+    "approved_by": "user",
+    "approved_at": "2026-08-30T22:30:00Z",
+    "expires_at": "2026-08-31T00:00:49Z",
+    "allowed_effects": [
+      "read",
+      "edit",
+      "test",
+      "drive_canonical_write"
+    ],
+    "denied_effects": [
+      "commit",
+      "merge",
+      "push",
+      "deploy",
+      "activate"
+    ]
+  },
+  "context_projection": {
+    "schema_version": "canonical-context-projection/v1",
+    "source_items": [
+      {
+        "content_id": "managed-policy-1",
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "scope": "global",
+        "authority_class": "managed_policy",
+        "load_reason": "always_required",
+        "freshness_status": "CURRENT",
+        "estimated_tokens": 256,
+        "source_kind": "policy"
+      }
+    ],
+    "loaded_items": [
+      {
+        "content_id": "managed-policy-1",
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "scope": "global",
+        "authority_class": "managed_policy",
+        "load_reason": "always_required",
+        "freshness_status": "CURRENT",
+        "estimated_tokens": 256,
+        "source_kind": "policy"
+      }
+    ],
+    "equal_authority_conflict": false,
+    "conflict_blocked": false,
+    "memory": {
+      "asserted_by": "none",
+      "promotion_authorized_by_user": false,
+      "durably_promoted": false
+    }
+  },
+  "capabilities": [
+    {
+      "schema_version": "canonical-capability-manifest/v2",
+      "capability_id": "drive.read",
+      "provider_id": "google-drive",
+      "provider_version": "v3",
+      "tool_schema_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "argument_bounds": {
+        "max_bytes": 4096
+      },
+      "side_effect_class": "read_only",
+      "permission_decision": "ALLOW",
+      "required_dependencies": [
+        "python"
+      ],
+      "available_dependencies": [
+        "python"
+      ],
+      "dependency_evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "qualified": true,
+      "executable_now": true,
+      "in_scope": true,
+      "visible": true,
+      "failure_semantics": "FAIL_CLOSED",
+      "result_budget": {
+        "max_bytes": 1024,
+        "observed_bytes": 512,
+        "truncated": false,
+        "provenance_preserved": true
+      }
+    }
+  ],
+  "control_plane": {
+    "schema_version": "canonical-control-plane-budget/v1",
+    "max_attempts_per_stage": 1,
+    "retry": false,
+    "backoff_ms": 0,
+    "deadline": "2026-08-31T00:00:49Z",
+    "stages": [
+      {
+        "stage": "drive",
+        "attempts": 1
+      },
+      {
+        "stage": "judge",
+        "attempts": 1
+      },
+      {
+        "stage": "jcode",
+        "attempts": 0
+      },
+      {
+        "stage": "specialist",
+        "attempts": 0
+      }
+    ]
+  },
+  "evidence_loop": {
+    "schema_version": "canonical-evidence-loop/v1",
+    "max_correction_iterations": 3,
+    "confidence_only": false,
+    "iterations": [
+      {
+        "iteration": 1,
+        "candidate_digest": "7777777777777777777777777777777777777777777777777777777777777777",
+        "plan_sha256": "c7ca0b7617d4d93189dbdba9c7763c3f69687f1ce895652707b94420cb8eb2d9",
+        "actions": [
+          "run focused tests"
+        ],
+        "observations": [
+          "all assertions passed"
+        ],
+        "acceptance_results": [
+          {
+            "criterion": "contract conformance",
+            "status": "PASS"
+          }
+        ],
+        "remaining_deltas": [],
+        "decision": "ACCEPT"
+      }
+    ]
+  },
+  "workspace_lease": {
+    "schema_version": "canonical-workspace-lease/v1",
+    "repository_id": "agent-capability-qualification",
+    "base_revision": "4ac181201b987b5e87d5026ee6ae7779c7ea2465",
+    "workspace_id": "canonical-agent-workflow-v2",
+    "branch_or_worktree": ".worktrees/canonical-agent-workflow-v2",
+    "owner_task_id": "01a052bd-6a4c-7932-9d51-da7c7c47c195",
+    "generation": 1,
+    "handoff_generation": 1,
+    "scope_digest": "2a14bc9d10a5556db81c6e514d195c12d39ac23fdc12e29a73588e75d97f8f1c",
+    "issued_at": "2026-08-30T22:30:49Z",
+    "expires_at": "2026-08-31T00:00:49Z",
+    "status": "ACTIVE",
+    "live_descendant_count": 0,
+    "unresolved_waiter_count": 0,
+    "live_writer_count": 1
+  },
+  "run_result": {
+    "schema_version": "canonical-run-result/v2",
+    "status": "PASS",
+    "source_status": "PASS",
+    "rendered_status": "PASS",
+    "summary": "Conformance record passed.",
+    "reason_codes": [],
+    "request_sha256": "b7f4fbe58c52fdfe3c4274f3389bbded49282232ed588b52cf6f5b70ee7e94ea",
+    "receipt_sha256": "82ab9429425eb895f277122fa564ad755f1f99f9b00b6f3c579d20cade0ab3e6",
+    "context_packet_sha256": "6716fdb4341540e8de1e82d6f77f2a3f42ffc7d6fdaf5cd4f5688aab6fc314fc",
+    "phase": "VERIFY",
+    "attempts": 1,
+    "correction_iterations": 0,
+    "authority": "Sol",
+    "next_actions": [],
+    "artifacts": [
+      {
+        "artifact_id": "candidate",
+        "sha256": "8888888888888888888888888888888888888888888888888888888888888888"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "tests",
+        "sha256": "9999999999999999999999999999999999999999999999999999999999999999"
+      }
+    ],
+    "provenance": [
+      {
+        "source_id": "agent-capability-qualification@4ac1812",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  },
+  "publication": {
+    "schema_version": "canonical-drive-publication/v2",
+    "candidate_validated": true,
+    "publication_attempted": true,
+    "readback_verified": true,
+    "receipt_validated": true,
+    "expected_generation": 4,
+    "current_generation": 4,
+    "target_generation": 5,
+    "head_updated": true,
+    "cleanup_started": false,
+    "activation_started": false
+  },
+  "sandbox_canary": {
+    "schema_version": "canonical-disposable-canary/v1",
+    "backend": "Docker",
+    "image_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "status": "PASS",
+    "isolation_evidence": {
+      "network_none": true,
+      "default_deny_egress": true,
+      "finite_ttl": true,
+      "resource_caps": true,
+      "pinned_identities": true,
+      "no_host_mounts": true,
+      "no_docker_socket": true,
+      "no_production_credentials": true,
+      "negative_authority_probe": true,
+      "tamper_probe": true,
+      "timeout_probe": true,
+      "lifecycle_probe": true,
+      "host_isolation_probe": true,
+      "rollback_identity": true,
+      "verified_teardown": true
+    },
+    "opensandbox_runtime_parity_claimed": false,
+    "teardown_verified": true
+  },
+  "adapter_manifest": {
+    "schema_version": "canonical-workflow-adapter-manifest/v1",
+    "adapter_id": "Sol/Codex",
+    "provider_version": "gpt-5.6-sol",
+    "source_revision": "4ac181201b987b5e87d5026ee6ae7779c7ea2465",
+    "contract_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "vector_tree_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "dependency_closure_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "status": "PASS",
+    "global_completion_claim": false,
+    "all_required_adapters_passed": false
+  },
+  "authority": {
+    "decision_owner": "Sol",
+    "integration_owner": "Sol/Codex",
+    "conclusion_owner": "Sol",
+    "activation_authority": "none",
+    "allowed_effects": [
+      "read",
+      "edit",
+      "test"
+    ],
+    "denied_effects": [
+      "commit",
+      "merge",
+      "push",
+      "deploy",
+      "publish",
+      "activate"
+    ]
+  },
+  "provenance": {
+    "repository": "https://github.com/Anazeez/agent-capability-qualification.git",
+    "source_revision": "4ac181201b987b5e87d5026ee6ae7779c7ea2465",
+    "contract_owner": "agent-capability-qualification",
+    "contract_status": "FROZEN_CANDIDATE",
+    "proposal_file_id": "1MHrew-Pe_UFKDGzWsLfcnWazSkLg3ZxR",
+    "proposal_raw_sha256": "c304ef7c6c2ebc8ee616ac46f2c3d8f5cec8ad41244d2e3b6f0c666b0130357e"
+  }
+}

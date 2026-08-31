@@ -1,0 +1,10 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "cleanup_before_readback_denied",
+  "overlay": {
+    "publication": {
+      "readback_verified": false,
+      "cleanup_started": false
+    }
+  }
+}

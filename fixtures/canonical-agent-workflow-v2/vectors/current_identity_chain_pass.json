@@ -1,0 +1,5 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "current_identity_chain_pass",
+  "overlay": {}
+}
