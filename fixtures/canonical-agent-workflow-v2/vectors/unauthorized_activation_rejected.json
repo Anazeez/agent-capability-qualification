@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "unauthorized_activation_rejected",
+  "overlay": {
+    "publication": {
+      "activation_started": true
+    }
+  }
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "contracts" / "canonical-agent-workflow-v2.schema.json"
 VECTOR_MANIFEST = ROOT / "fixtures" / "canonical-agent-workflow-v2" / "vector-manifest.json"
 CONTRACT_SHA256 = "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf"
-VECTOR_MANIFEST_SHA256 = "66af03e86d67e016d8000902dafd396eb898a6678591fb0291ddc6af846330d3"
-VECTOR_TREE_SHA256 = "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa"
+VECTOR_MANIFEST_SHA256 = "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614"
+VECTOR_TREE_SHA256 = "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed"
 
 
 def build_manifest(source: Path) -> dict[str, object]:
@@ -61,9 +62,9 @@ def build_manifest(source: Path) -> dict[str, object]:
             "contract_sha256": CONTRACT_SHA256,
             "vector_manifest_sha256": VECTOR_MANIFEST_SHA256,
             "vector_tree_sha256": VECTOR_TREE_SHA256,
-            "vector_count": 24,
+            "vector_count": 37,
             "accepted_count": 10,
-            "rejected_count": 14,
+            "rejected_count": 27,
             "shared_vectors_passed": True,
             "live_execution_performed": False,
             "activation_authority": "none",
@@ -80,7 +81,7 @@ class WorkflowAdapterV2Tests(unittest.TestCase):
             result = qualify_adapter(manifest, source, CONTRACT, VECTOR_MANIFEST)
         self.assertEqual(result["status"], "PASS_TEST_SHADOW_ONLY")
         self.assertEqual(result["adapter_id"], "Drive")
-        self.assertEqual(result["vectors_passed"], 24)
+        self.assertEqual(result["vectors_passed"], 37)
         self.assertFalse(result["global_completion_claim"])
 
     def test_source_identity_is_recomputed_not_trusted(self) -> None:
@@ -91,6 +92,28 @@ class WorkflowAdapterV2Tests(unittest.TestCase):
             source.write_bytes(b"changed source bytes")
             with self.assertRaisesRegex(AdapterQualificationError, "SOURCE_ARTIFACT_SHA256_MISMATCH"):
                 qualify_adapter(manifest, source, CONTRACT, VECTOR_MANIFEST)
+
+    def test_vector_tree_digest_binds_the_base_fixture(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            temporary_root = Path(directory)
+            source = temporary_root / "source.bin"
+            source.write_bytes(b"current source bytes")
+            manifest = build_manifest(source)
+            fixture_copy = temporary_root / "canonical-agent-workflow-v2"
+            shutil.copytree(VECTOR_MANIFEST.parent, fixture_copy)
+            base = fixture_copy / "base-valid.json"
+            base.write_bytes(base.read_bytes() + b"\n")
+
+            with self.assertRaisesRegex(
+                AdapterQualificationError,
+                "VECTOR_TREE_SHA256_MISMATCH",
+            ):
+                qualify_adapter(
+                    manifest,
+                    source,
+                    CONTRACT,
+                    fixture_copy / "vector-manifest.json",
+                )
 
     def test_dependency_closure_digest_and_set_equality_are_required(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

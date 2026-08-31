@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "nonsequential_target_generation_rejected",
+  "overlay": {
+    "publication": {
+      "target_generation": 6
+    }
+  }
+}

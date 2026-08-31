@@ -3,7 +3,7 @@
   "vector_id": "docker_canary_without_required_isolation_evidence_rejected",
   "overlay": {
     "sandbox_canary": {
-      "status": "FAIL",
+      "status": "PASS",
       "isolation_evidence": {
         "network_none": true,
         "default_deny_egress": true,

@@ -1,0 +1,9 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "unverified_docker_teardown_rejected",
+  "overlay": {
+    "sandbox_canary": {
+      "teardown_verified": false
+    }
+  }
+}

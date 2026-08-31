@@ -40,6 +40,19 @@ MANDATORY_VECTORS = (
     "opensandbox_runtime_parity_claim_from_docker_rejected",
     "cleanup_before_readback_denied",
     "adapter_pass_not_global_pass",
+    "drive_blocked_rejected",
+    "drive_ready_with_reason_codes_rejected",
+    "released_workspace_lease_rejected",
+    "missing_writer_lease_rejected",
+    "failed_docker_canary_rejected",
+    "unverified_docker_teardown_rejected",
+    "failed_adapter_rejected",
+    "unauthorized_activation_rejected",
+    "head_update_without_readback_rejected",
+    "head_update_without_receipt_validation_rejected",
+    "nonsequential_target_generation_rejected",
+    "top_level_typed_status_mismatch_rejected",
+    "authority_effect_overlap_rejected",
 )
 
 REQUIRED_DEFINITIONS = {
@@ -189,6 +202,8 @@ def evaluate_workflow(value: dict[str, Any]) -> tuple[str, str]:
     attestation = value["drive_attestation"]
     if attestation["status"] == "READY" and attestation["asserted_by"] != "validator":
         return "REJECT", "MODEL_ASSERTED_DRIVE_READY"
+    if attestation["status"] != "READY" or attestation["reason_codes"]:
+        return "REJECT", "DRIVE_CHAIN_NOT_READY"
     if len({
         attestation["guidance_sha256"],
         attestation["manifest_guidance_sha256"],
@@ -220,6 +235,10 @@ def evaluate_workflow(value: dict[str, Any]) -> tuple[str, str]:
     )
     if any(approval[left] != approval[right] for left, right in identity_pairs):
         return "REJECT", "APPROVAL_IDENTITY_DRIFT"
+
+    authority = value["authority"]
+    if set(authority["allowed_effects"]) & set(authority["denied_effects"]):
+        return "REJECT", "AUTHORITY_EFFECT_CONFLICT"
 
     projection = value["context_projection"]
     loaded_hashes = [item["sha256"] for item in projection["loaded_items"]]
@@ -253,32 +272,52 @@ def evaluate_workflow(value: dict[str, Any]) -> tuple[str, str]:
         return "REJECT", "CORRECTION_PLAN_DRIFT"
 
     lease = value["workspace_lease"]
+    if lease["status"] != "ACTIVE":
+        return "REJECT", "WORKSPACE_LEASE_NOT_ACTIVE"
     if lease["live_writer_count"] > 1:
         return "REJECT", "DUPLICATE_WRITER"
+    if lease["live_writer_count"] != 1:
+        return "REJECT", "WRITER_LEASE_NOT_HELD"
     if lease["handoff_generation"] != lease["generation"]:
         return "REJECT", "STALE_HANDOFF_GENERATION"
 
     result = value["run_result"]
-    if result["source_status"] != result["rendered_status"]:
+    if len({result["status"], result["source_status"], result["rendered_status"]}) != 1:
         return "REJECT", "TYPED_OUTCOME_FLATTENED"
 
     publication = value["publication"]
+    if publication["activation_started"]:
+        return "REJECT", "ACTIVATION_NOT_AUTHORIZED"
     if not publication["candidate_validated"] and publication["publication_attempted"]:
         return "REJECT", "UNVALIDATED_PUBLICATION"
+    if publication["target_generation"] != publication["expected_generation"] + 1:
+        return "REJECT", "CAS_TARGET_GENERATION_INVALID"
     if publication["current_generation"] != publication["expected_generation"] and publication["head_updated"]:
         return "REJECT", "CAS_GENERATION_CONFLICT"
+    if publication["head_updated"] and not (
+        publication["publication_attempted"]
+        and publication["readback_verified"]
+        and publication["receipt_validated"]
+    ):
+        return "REJECT", "PUBLICATION_READBACK_UNVERIFIED"
     if not publication["readback_verified"] and publication["cleanup_started"]:
         return "REJECT", "CLEANUP_BEFORE_READBACK"
 
     canary = value["sandbox_canary"]
     if canary["backend"] != "Docker":
         return "REJECT", "DOCKER_BACKEND_REQUIRED"
+    if canary["status"] != "PASS":
+        return "REJECT", "DOCKER_CANARY_NOT_PASS"
     if not all(canary["isolation_evidence"].values()):
         return "REJECT", "DOCKER_ISOLATION_EVIDENCE_MISSING"
+    if not canary["teardown_verified"]:
+        return "REJECT", "DOCKER_TEARDOWN_UNVERIFIED"
     if canary["opensandbox_runtime_parity_claimed"]:
         return "REJECT", "RUNTIME_PARITY_UNPROVEN"
 
     adapter = value["adapter_manifest"]
+    if adapter["status"] != "PASS":
+        return "REJECT", "ADAPTER_NOT_PASS"
     if adapter["status"] == "PASS" and adapter["global_completion_claim"] and not adapter["all_required_adapters_passed"]:
         return "REJECT", "ADAPTER_PASS_OVERCLAIMED"
     return "ACCEPT", "CONFORMANT"
@@ -305,6 +344,81 @@ class CanonicalAgentWorkflowV2Tests(unittest.TestCase):
         self.assertEqual(self.manifest["schema_version"], "canonical-agent-workflow-vector-manifest/v2")
         self.assertEqual(tuple(item["vector_id"] for item in self.manifest["vectors"]), MANDATORY_VECTORS)
         self.assertEqual(len({item["vector_id"] for item in self.manifest["vectors"]}), len(MANDATORY_VECTORS))
+
+    def test_operationally_unsafe_states_fail_closed(self) -> None:
+        cases = (
+            (
+                "drive_blocked",
+                ("drive_attestation", "status", "BLOCKED"),
+                ("REJECT", "DRIVE_CHAIN_NOT_READY"),
+            ),
+            (
+                "drive_ready_with_reasons",
+                ("drive_attestation", "reason_codes", ["STALE_EVIDENCE"]),
+                ("REJECT", "DRIVE_CHAIN_NOT_READY"),
+            ),
+            (
+                "lease_released",
+                ("workspace_lease", "status", "RELEASED"),
+                ("REJECT", "WORKSPACE_LEASE_NOT_ACTIVE"),
+            ),
+            (
+                "writer_lease_not_held",
+                ("workspace_lease", "live_writer_count", 0),
+                ("REJECT", "WRITER_LEASE_NOT_HELD"),
+            ),
+            (
+                "canary_failed",
+                ("sandbox_canary", "status", "FAIL"),
+                ("REJECT", "DOCKER_CANARY_NOT_PASS"),
+            ),
+            (
+                "canary_teardown_unverified",
+                ("sandbox_canary", "teardown_verified", False),
+                ("REJECT", "DOCKER_TEARDOWN_UNVERIFIED"),
+            ),
+            (
+                "adapter_not_passed",
+                ("adapter_manifest", "status", "FAIL"),
+                ("REJECT", "ADAPTER_NOT_PASS"),
+            ),
+            (
+                "activation_without_authority",
+                ("publication", "activation_started", True),
+                ("REJECT", "ACTIVATION_NOT_AUTHORIZED"),
+            ),
+            (
+                "head_without_readback",
+                ("publication", "readback_verified", False),
+                ("REJECT", "PUBLICATION_READBACK_UNVERIFIED"),
+            ),
+            (
+                "head_without_receipt_validation",
+                ("publication", "receipt_validated", False),
+                ("REJECT", "PUBLICATION_READBACK_UNVERIFIED"),
+            ),
+            (
+                "invalid_target_generation",
+                ("publication", "target_generation", 6),
+                ("REJECT", "CAS_TARGET_GENERATION_INVALID"),
+            ),
+            (
+                "typed_run_status_mismatch",
+                ("run_result", "status", "FAIL_CLOSED"),
+                ("REJECT", "TYPED_OUTCOME_FLATTENED"),
+            ),
+            (
+                "authority_effect_overlap",
+                ("authority", "allowed_effects", ["read", "edit", "test", "deploy"]),
+                ("REJECT", "AUTHORITY_EFFECT_CONFLICT"),
+            ),
+        )
+        for name, (group, field, unsafe_value), expected in cases:
+            with self.subTest(case=name):
+                candidate = copy.deepcopy(self.base)
+                candidate[group][field] = unsafe_value
+                self.assertEqual(validate_schema_instance(candidate, self.schema, self.schema), [])
+                self.assertEqual(evaluate_workflow(candidate), expected)
 
     def test_vector_files_are_hash_bound_and_conform(self) -> None:
         for item in self.manifest["vectors"]:

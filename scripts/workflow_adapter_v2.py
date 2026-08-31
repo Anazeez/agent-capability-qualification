@@ -3,14 +3,16 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import stat
 from datetime import datetime, timezone
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any, Mapping
 
 
 CONTRACT_SHA256 = "0598c73e833d8efb36b0b7ed4a114ef807ae7e8c6af2b05df7405d2e499affaf"
-VECTOR_MANIFEST_SHA256 = "66af03e86d67e016d8000902dafd396eb898a6678591fb0291ddc6af846330d3"
-VECTOR_TREE_SHA256 = "0c85352c79fca9851777cc8610ec2fface0de45ff4c949fb3bff5182b240ceaa"
+VECTOR_MANIFEST_SHA256 = "bbb1f4dd407f8c3881238edb47c3f2b53b420ce964c5fdf4f8a05b656f106614"
+VECTOR_TREE_SHA256 = "b3b449c3825e2917e935fafd54fa0d0151c4c933c3238c8dba34dffd1c4ec6ed"
 TYPED_STATUSES = frozenset(
     {
         "READY",
@@ -163,6 +165,35 @@ def _require_sha256(value: Any, code: str) -> str:
     return value
 
 
+def _fixture_file(root: Path, relative: Any, code: str) -> tuple[Path, str]:
+    if not isinstance(relative, str) or not relative or "\\" in relative:
+        raise AdapterQualificationError(code)
+    normalized = PurePosixPath(relative)
+    if normalized.is_absolute() or ".." in normalized.parts or "." in normalized.parts:
+        raise AdapterQualificationError(code)
+    path = root.joinpath(*normalized.parts)
+    if path.is_symlink() or not path.is_file():
+        raise AdapterQualificationError(code)
+    return path, normalized.as_posix()
+
+
+def _vector_tree_sha256(entries: list[tuple[Path, str]]) -> str:
+    rows = []
+    for path, relative in entries:
+        raw = path.read_bytes()
+        mode = format(stat.S_IMODE(path.stat().st_mode), "o")
+        canonical_path = "fixtures/canonical-agent-workflow-v2/{}".format(relative)
+        rows.append(
+            "{}\t{}\t{}\t{}\n".format(
+                canonical_path,
+                mode,
+                len(raw),
+                hashlib.sha256(raw).hexdigest(),
+            )
+        )
+    return hashlib.sha256("".join(sorted(rows)).encode("utf-8")).hexdigest()
+
+
 def _validate_vector_tree(vector_manifest_path: Path) -> tuple[int, int, int]:
     try:
         manifest_bytes = vector_manifest_path.read_bytes()
@@ -176,7 +207,18 @@ def _validate_vector_tree(vector_manifest_path: Path) -> tuple[int, int, int]:
     vectors = manifest.get("vectors")
     if not isinstance(vectors, list) or len(vectors) != manifest.get("vector_count"):
         raise AdapterQualificationError("VECTOR_COUNT_MISMATCH")
+    fixture_root = vector_manifest_path.parent
+    base_path, base_relative = _fixture_file(
+        fixture_root,
+        manifest.get("base_file"),
+        "VECTOR_BASE_FILE_INVALID",
+    )
+    tree_entries = [
+        (vector_manifest_path, "vector-manifest.json"),
+        (base_path, base_relative),
+    ]
     seen: set[str] = set()
+    seen_paths: set[str] = set()
     for item in vectors:
         if not isinstance(item, dict) or set(item) != {
             "vector_id",
@@ -190,13 +232,23 @@ def _validate_vector_tree(vector_manifest_path: Path) -> tuple[int, int, int]:
         if not isinstance(vector_id, str) or not vector_id or vector_id in seen:
             raise AdapterQualificationError("VECTOR_ID_INVALID")
         seen.add(vector_id)
-        path = vector_manifest_path.parent / item["file"]
+        path, relative = _fixture_file(
+            fixture_root,
+            item["file"],
+            "VECTOR_FILE_UNAVAILABLE",
+        )
+        if relative in seen_paths:
+            raise AdapterQualificationError("VECTOR_FILE_DUPLICATE")
+        seen_paths.add(relative)
         try:
             raw = path.read_bytes()
         except OSError as error:
             raise AdapterQualificationError("VECTOR_FILE_UNAVAILABLE") from error
         if hashlib.sha256(raw).hexdigest() != item["sha256"]:
             raise AdapterQualificationError("VECTOR_FILE_SHA256_MISMATCH")
+        tree_entries.append((path, relative))
+    if _vector_tree_sha256(tree_entries) != VECTOR_TREE_SHA256:
+        raise AdapterQualificationError("VECTOR_TREE_SHA256_MISMATCH")
     accepted = sum(item["expected_decision"] == "ACCEPT" for item in vectors)
     rejected = sum(item["expected_decision"] == "REJECT" for item in vectors)
     if accepted != manifest.get("accepted_count") or rejected != manifest.get("rejected_count"):

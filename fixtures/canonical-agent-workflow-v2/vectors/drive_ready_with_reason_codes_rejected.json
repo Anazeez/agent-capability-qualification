@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical-agent-workflow-conformance-vector/v2",
+  "vector_id": "drive_ready_with_reason_codes_rejected",
+  "overlay": {
+    "drive_attestation": {
+      "reason_codes": [
+        "STALE_EVIDENCE"
+      ]
+    }
+  }
+}
